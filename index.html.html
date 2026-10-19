@@ -1,0 +1,158 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0d12"><title>Compagnon Pêche</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0d12;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--tx:#f2f4f8;--mut:#9aa3b2;--red:#ff3b4e;--vio:#7a5cff;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--tx);font-family:Inter,system-ui,sans-serif}
+body{background:radial-gradient(120% 60% at 80% 100%,rgba(230,235,245,.28),transparent 60%),radial-gradient(90% 50% at 0% 70%,rgba(255,59,78,.28),transparent 60%),radial-gradient(80% 40% at 0% 85%,rgba(122,92,255,.22),transparent 60%),linear-gradient(180deg,#14171e 0%,#2a2f39 45%,#0b0d12 100%);background-attachment:fixed}
+.app{max-width:480px;margin:0 auto;min-height:100vh;min-height:100dvh;padding:20px 20px 28px;display:flex;flex-direction:column}
+h1,h2,.num{font-family:Rajdhani,Impact,sans-serif;text-transform:uppercase;letter-spacing:.04em;margin:0}
+.screen{display:none;flex:1;flex-direction:column;animation:in .35s ease}.screen.on{display:flex}
+@keyframes in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.home{justify-content:flex-end;gap:14px;padding-bottom:20px}
+.home h1{font-size:56px;line-height:.9;font-weight:700}.home h1 span{color:var(--red);text-shadow:0 0 24px rgba(255,59,78,.7)}
+.home p{color:var(--mut);margin:0 0 14px;line-height:1.5}
+.btn{border:0;border-radius:14px;padding:17px 20px;font:700 19px Rajdhani,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:linear-gradient(100deg,var(--red),#c2185b 60%,var(--vio));box-shadow:0 0 28px rgba(255,59,78,.45);width:100%;cursor:pointer}
+.btn:active{transform:scale(.98)}.btn.ghost{background:var(--card);box-shadow:none;border:1px solid var(--line);color:var(--tx)}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.back{background:var(--card);border:1px solid var(--line);color:var(--tx);width:40px;height:40px;border-radius:12px;font-size:20px;cursor:pointer}
+.bar{flex:1;display:flex;gap:5px}.bar i{flex:1;height:4px;border-radius:3px;background:var(--line)}.bar i.d{background:var(--red);box-shadow:0 0 8px var(--red)}
+.q small{color:var(--red);font:600 14px Rajdhani;letter-spacing:.2em;text-transform:uppercase}
+.q h2{font-size:34px;margin:4px 0 20px;font-weight:700}
+.opts{display:grid;gap:12px}
+.opt{display:flex;align-items:center;gap:14px;text-align:left;background:var(--card);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);color:var(--tx);border-radius:16px;padding:16px;font:500 16px Inter;cursor:pointer;transition:.15s}
+.opt .ic{font-size:26px;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:rgba(255,255,255,.08);flex:none}
+.opt b{display:block;font:700 20px Rajdhani;letter-spacing:.03em}.opt span.s{color:var(--mut);font-size:13px}
+.opt.sel{border-color:var(--red);box-shadow:0 0 20px rgba(255,59,78,.4);background:rgba(255,59,78,.14)}
+input{width:100%;background:var(--card);border:1px solid var(--line);color:var(--tx);border-radius:14px;padding:18px;font:600 20px Rajdhani;letter-spacing:.04em}
+input:focus{outline:0;border-color:var(--red);box-shadow:0 0 18px rgba(255,59,78,.35)}
+.foot{margin-top:auto;padding-top:22px}.hide{display:none}
+.recap{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 18px}.chip{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:6px 12px;font-size:13px;color:var(--mut)}
+.res h2{font-size:30px}.res .sub{color:var(--mut);font-size:14px;margin-top:2px}
+.hero{margin:16px 0 12px;padding:20px;border-radius:20px;border:1px solid rgba(255,59,78,.5);background:linear-gradient(135deg,rgba(255,59,78,.22),rgba(122,92,255,.16));box-shadow:0 0 30px rgba(255,59,78,.25)}
+.hero small,.cell small{color:var(--mut);font:600 13px Rajdhani;letter-spacing:.18em;text-transform:uppercase}
+.hero .num{font-size:44px;font-weight:700;line-height:1}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cell{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.cell .num{font-size:25px;font-weight:700;margin-top:4px}.cell.w{grid-column:1/-1}
+.note{margin-top:12px;font-size:13px;color:#ffc46b;background:rgba(255,196,107,.1);border:1px solid rgba(255,196,107,.3);border-radius:12px;padding:10px 12px}
+.acts{display:grid;gap:10px;margin-top:20px}
+
+.btn.alt{background:linear-gradient(100deg,#2b6cff,var(--vio) 60%,#c2185b);box-shadow:0 0 28px rgba(122,92,255,.45)}
+.home .row{display:grid;gap:12px}
+.opts.two{grid-template-columns:1fr 1fr}.opts.two .opt{padding:12px;gap:0;justify-content:center;text-align:center}.opts.two .opt b{font-size:18px}.opts.two .ic{display:none}
+.opts.dir{grid-template-columns:repeat(4,1fr)}.opts.dir .opt{padding:14px 0;justify-content:center}.opts.dir .opt b{font-size:22px}.opts.dir .ic{display:none}
+textarea{width:100%;min-height:160px;resize:none;background:var(--card);border:1px solid var(--line);color:var(--tx);border-radius:14px;padding:16px;font:500 16px Inter}
+textarea:focus{outline:0;border-color:var(--red)}
+#modal{position:fixed;inset:0;z-index:50;display:none;place-items:center;padding:24px;background:rgba(5,6,10,.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+#modal.on{display:grid}.mbox{max-width:380px;width:100%;background:#171a22;border:1px solid rgba(122,92,255,.6);border-radius:22px;padding:26px;box-shadow:0 0 40px rgba(122,92,255,.4);text-align:center}
+.mbox .ic{font-size:44px}.mbox h2{font-size:28px;margin:8px 0}.mbox p{color:var(--mut);line-height:1.5;margin:0 0 20px}
+.snap{margin:14px 0;padding:20px;border-radius:22px;border:1px solid rgba(255,59,78,.5);background:linear-gradient(160deg,rgba(255,59,78,.2),rgba(20,23,30,.9) 45%,rgba(122,92,255,.2));box-shadow:0 0 34px rgba(255,59,78,.25)}
+.snap .big{font-size:58px;font-weight:700;line-height:1;margin:2px 0 16px;text-shadow:0 0 24px rgba(255,59,78,.6)}
+.snap small.k{color:var(--red);font:600 14px Rajdhani;letter-spacing:.2em}
+.snap .cell{word-break:break-word}.snap .cell .num{font-size:22px}.snap .cmt{font:400 15px/1.5 Inter;text-transform:none;letter-spacing:0;margin-top:6px;white-space:pre-wrap}
+.brand{margin-top:14px;text-align:center;color:var(--mut);font:600 13px Rajdhani;letter-spacing:.25em;text-transform:uppercase}
+.hint{color:var(--mut);font-size:13px;text-align:center;margin-top:6px}
+</style></head><body><div class="app">
+
+<section class="screen home on" id="home">
+ <div style="flex:1;display:grid;place-items:center;font-size:90px;filter:drop-shadow(0 0 30px rgba(255,59,78,.6))">🎣</div>
+ <h1>Compagnon<br><span>Pêche</span></h1>
+ <p>Carnassiers : indique les conditions du jour, reçois la stratégie, le leurre, la couleur, l’animation et la zone à viser.</p>
+ <div class="row"><button class="btn" id="create">Créer une sortie</button><button class="btn alt" id="fish">Fish On 🐟</button></div>
+</section>
+
+<section class="screen" id="wiz">
+ <div class="top"><button class="back" id="back" aria-label="Retour">‹</button><div class="bar" id="bar"></div></div>
+ <div class="q" id="q"></div>
+ <div class="foot"><button class="btn hide" id="next">Continuer</button></div>
+</section>
+
+<section class="screen res" id="res"></section>
+<section class="screen res" id="fres"></section>
+</div>
+<div id="modal"><div class="mbox"><div class="ic">📲</div><h2>Fish On</h2><p>Remplir les données suivantes à l’aide de l’application Decathlon Fishing.</p><button class="btn alt" id="ok">OK</button></div></div>
+<script>
+const M={"Soleil|Claire|Baisse modérée":{"v":"Faible","s":"Finesse","c":"Naturel","l":"Soft jerkbait","a":"Lente","z":"Bordures"},"Soleil|Claire|Chute brutale":{"v":"Fort","s":"Réaction","c":"Brillant","l":"Spinnerbait","a":"Rapide","z":"Pleine eau"},"Soleil|Claire|Stable":{"v":"Modéré","s":"Standard","c":"Naturel","l":"Swimbait","a":"Moyenne","z":"Herbiers"},"Soleil|Claire|Hausse":{"v":"Faible","s":"Prospection","c":"Clair","l":"Topwater","a":"Lente","z":"Surface"},"Soleil|Teintée / Thé|Baisse modérée":{"v":"Modéré","s":"Contraste","c":"Chartreuse","l":"Crankbait","a":"Moyenne","z":"Cassures"},"Soleil|Teintée / Thé|Chute brutale":{"v":"Fort","s":"Vibration","c":"Sombre","l":"Lipless","a":"Rapide","z":"Fonds"},"Soleil|Teintée / Thé|Stable":{"v":"Faible","s":"Finesse","c":"Blanc","l":"Jig","a":"Lente","z":"Bois morts"},"Soleil|Teintée / Thé|Hausse":{"v":"Modéré","s":"Réaction","c":"Flashy","l":"Jerkbait","a":"Moyenne","z":"Pleine eau"},"Soleil|Très trouble|Baisse modérée":{"v":"Fort","s":"Bruit","c":"Sombre","l":"Chatterbait","a":"Lente","z":"Bordures"},"Soleil|Très trouble|Chute brutale":{"v":"Fort","s":"Vibration max","c":"Noir","l":"Spinnerbait colorado","a":"Rapide","z":"Fonds"},"Soleil|Très trouble|Stable":{"v":"Modéré","s":"Silhouette","c":"Noir/Bleu","l":"Rubber Jig","a":"Lente","z":"Obstacles"},"Soleil|Très trouble|Hausse":{"v":"Faible","s":"Bruit","c":"Sombre","l":"Squarebill","a":"Moyenne","z":"Bordures"},"Couvert|Claire|Baisse modérée":{"v":"Faible","s":"Finesse","c":"Naturel","l":"Worm","a":"Lente","z":"Fonds"},"Couvert|Claire|Chute brutale":{"v":"Fort","s":"Réaction","c":"Blanc","l":"Jerkbait","a":"Rapide","z":"Pleine eau"},"Couvert|Claire|Stable":{"v":"Modéré","s":"Prospection","c":"Ayu","l":"Swimbait","a":"Moyenne","z":"Herbiers"},"Couvert|Claire|Hausse":{"v":"Faible","s":"Surface","c":"Naturel","l":"Stickbait","a":"Lente","z":"Surface"},"Couvert|Teintée / Thé|Baisse modérée":{"v":"Modéré","s":"Contraste","c":"Chartreuse","l":"Crankbait","a":"Moyenne","z":"Cassures"},"Couvert|Teintée / Thé|Chute brutale":{"v":"Fort","s":"Vibration","c":"Sombre","l":"Lipless","a":"Rapide","z":"Fonds"},"Couvert|Teintée / Thé|Stable":{"v":"Faible","s":"Finesse","c":"Blanc","l":"Jig","a":"Lente","z":"Bois morts"},"Couvert|Teintée / Thé|Hausse":{"v":"Modéré","s":"Réaction","c":"Flashy","l":"Jerkbait","a":"Moyenne","z":"Pleine eau"},"Couvert|Très trouble|Baisse modérée":{"v":"Fort","s":"Bruit","c":"Sombre","l":"Chatterbait","a":"Lente","z":"Bordures"},"Couvert|Très trouble|Chute brutale":{"v":"Fort","s":"Vibration max","c":"Noir","l":"Spinnerbait colorado","a":"Rapide","z":"Fonds"},"Couvert|Très trouble|Stable":{"v":"Modéré","s":"Silhouette","c":"Noir/Bleu","l":"Rubber Jig","a":"Lente","z":"Obstacles"},"Couvert|Très trouble|Hausse":{"v":"Faible","s":"Bruit","c":"Sombre","l":"Squarebill","a":"Moyenne","z":"Bordures"},"Orageux / Sombre|Claire|Baisse modérée":{"v":"Faible","s":"Finesse","c":"Naturel","l":"Worm","a":"Lente","z":"Fonds"},"Orageux / Sombre|Claire|Chute brutale":{"v":"Fort","s":"Réaction","c":"Blanc","l":"Jerkbait","a":"Rapide","z":"Pleine eau"},"Orageux / Sombre|Claire|Stable":{"v":"Modéré","s":"Prospection","c":"Ayu","l":"Swimbait","a":"Moyenne","z":"Herbiers"},"Orageux / Sombre|Claire|Hausse":{"v":"Faible","s":"Surface","c":"Naturel","l":"Stickbait","a":"Lente","z":"Surface"},"Orageux / Sombre|Teintée / Thé|Baisse modérée":{"v":"Modéré","s":"Contraste","c":"Chartreuse","l":"Crankbait","a":"Moyenne","z":"Cassures"},"Orageux / Sombre|Teintée / Thé|Chute brutale":{"v":"Fort","s":"Vibration","c":"Sombre","l":"Lipless","a":"Rapide","z":"Fonds"},"Orageux / Sombre|Teintée / Thé|Stable":{"v":"Faible","s":"Finesse","c":"Blanc","l":"Jig","a":"Lente","z":"Bois morts"},"Orageux / Sombre|Teintée / Thé|Hausse":{"v":"Modéré","s":"Réaction","c":"Flashy","l":"Jerkbait","a":"Moyenne","z":"Pleine eau"},"Orageux / Sombre|Très trouble|Baisse modérée":{"v":"Fort","s":"Bruit","c":"Flashy","l":"Chatterbait","a":"Lente","z":"Bordures"},"Orageux / Sombre|Très trouble|Chute brutale":{"v":"Fort","s":"Vibration max","c":"Flashy","l":"Spinnerbait colorado","a":"Rapide","z":"Fonds"},"Orageux / Sombre|Très trouble|Stable":{"v":"Modéré","s":"Silhouette","c":"Flashy","l":"Rubber Jig","a":"Lente","z":"Obstacles"},"Orageux / Sombre|Très trouble|Hausse":{"v":"Faible","s":"Bruit","c":"Flashy","l":"Squarebill","a":"Moyenne","z":"Bordures"}};
+
+const SKY=[["Soleil","☀️","Ensoleillé"],["Couvert","☁️","Nuageux / couvert"],["Orageux / Sombre","⛈️","Orageux / sombre"]];
+const EAU=[["Claire","💧","Claire"],["Teintée / Thé","🍵","Teintée"],["Très trouble","🟤","Très teintée"]];
+const VENT=[["Faible","🍃","Faible / calme","0–10 km/h"],["Modéré","🌬️","Modéré","10–25 km/h"],["Fort","💨","Fort","+25 km/h"]];
+const PRES=[["Baisse modérée","↘️","Baisse modérée"],["Chute brutale","⬇️","Chute brutale"],["Stable","➡️","Stable"],["Hausse","↗️","Hausse"]];
+const FISH=[["Truite","🐟","Truite"],["Brochet","🐊","Brochet"],["Sandre","👁️","Sandre"],["Perche","🐠","Perche"]];
+const LEU=[...new Set(Object.values(M).map(r=>r.l))].map(l=>[l,"",l]);
+const ANI=[["Lente","🐢","Lente"],["Moyenne","🚶","Moyenne"],["Rapide","⚡","Rapide"]];
+const DIR=["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSO","SO","OSO","O","ONO","NO","NNO"].map(d=>[d,"",d]);
+const LAB={ciel:SKY,eau:EAU,vent:VENT,pression:PRES};
+const SORTIE={steps:[
+ {k:"id",t:"Nomme ta sortie",type:"text",ph:"Ex : Lac du matin"},
+ {k:"ciel",t:"La météo",o:SKY},{k:"eau",t:"Couleur de l’eau",o:EAU},{k:"vent",t:"Force du vent",o:VENT},{k:"pression",t:"Tendance de pression",o:PRES}],done:()=>result()};
+const FISHON={steps:[
+ {k:"poisson",t:"Type de poisson",o:FISH},{k:"poste",t:"Le poste",type:"text",ph:"Ex : Ponton nord, pointe des roseaux"},{k:"leurre",t:"Leurre utilisé",o:LEU,cls:"two"},{k:"anim",t:"Animation",o:ANI},
+ {k:"couleur",t:"Couleur du leurre",type:"text",ph:"Ex : Chartreuse"},
+ {k:"hpa",t:"Pression atmosphérique",type:"text",ph:"Ex : 1015 hPa",im:"decimal"},
+ {k:"ciel",t:"La météo",o:SKY},
+ {k:"temp",t:"Température",type:"text",ph:"Ex : 14 °C",im:"decimal"},
+ {k:"dir",t:"Sens du vent",o:DIR,cls:"dir"},
+ {k:"ventf",t:"Force du vent",type:"text",ph:"Ex : 12 km/h",im:"decimal"},
+ {k:"note",t:"Commentaires",type:"area",ph:"Un petit mot sur cette prise…"}],done:()=>fishRes()};
+const $=id=>document.getElementById(id);let st=0,S={},F=SORTIE;
+const e=t=>String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+const show=id=>{document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));scrollTo(0,0)};
+const lab=(k,v)=>LAB[k].find(o=>o[0]===v)[2];
+function start(f){F=f;S={};st=0;show('wiz');render()}
+function render(){
+ const s=F.steps[st],n=F.steps.length,last=st===n-1;
+ $('bar').innerHTML=F.steps.map((_,i)=>`<i class="${i<=st?'d':''}"></i>`).join('');
+ let h=`<small>Étape ${st+1} / ${n}</small><h2>${s.t}</h2>`;
+ if(s.type==='text')h+=`<input id="inp" maxlength="40" placeholder="${e(s.ph)}" inputmode="${s.im||'text'}" value="${e(S[s.k])}" autocomplete="off">`;
+ else if(s.type==='area')h+=`<textarea id="inp" maxlength="300" placeholder="${e(s.ph)}">${e(S[s.k])}</textarea>`;
+ else h+=`<div class="opts ${s.cls||''}">`+s.o.map(o=>`<button class="opt ${S[s.k]===o[0]?'sel':''}" data-v="${e(o[0])}"><span class="ic">${o[1]}</span><div><b>${o[2]}</b>${o[3]?`<span class="s">${o[3]}</span>`:''}</div></button>`).join('')+'</div>';
+ $('q').innerHTML=h;
+ const nx=$('next');nx.textContent=last?'Valider':'Continuer';nx.classList.add('hide');
+ if(s.type){nx.classList.remove('hide');$('inp').oninput=ev=>S[s.k]=ev.target.value}
+ else{if(S[s.k]&&last)nx.classList.remove('hide');
+  document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{S[s.k]=b.dataset.v;document.querySelectorAll('.opt').forEach(x=>x.classList.toggle('sel',x===b));
+   if(!last)setTimeout(()=>{st++;render()},220);else nx.classList.remove('hide')})}
+}
+$('create').onclick=()=>start(SORTIE);
+$('fish').onclick=()=>$('modal').classList.add('on');
+$('ok').onclick=()=>{$('modal').classList.remove('on');start(FISHON)};
+$('back').onclick=()=>{if(st>0){st--;render()}else show('home')};
+$('next').onclick=()=>{const s=F.steps[st];
+ if(s.k==='id'&&!(S.id||'').trim())S.id='Sortie du '+new Date().toLocaleDateString('fr-FR');
+ if(st<F.steps.length-1){st++;render()}else F.done()};
+function result(){
+ const r=M[[S.ciel,S.eau,S.pression].join('|')];
+ const wl=lab('vent',S.vent);
+ const note=r.v!==S.vent?`<div class="note">ℹ️ La matrice a été établie pour un vent « ${lab('vent',r.v).toLowerCase()} » avec ces conditions. Avec un vent ${wl.toLowerCase()}, adapte le poids du leurre et ta dérive.</div>`:'';
+ $('res').innerHTML=`<small style="color:var(--red);font:600 14px Rajdhani;letter-spacing:.2em">PLAN DE PÊCHE</small><h2>${e(S.id)}</h2>
+ <div class="recap">${[['ciel',S.ciel],['eau',S.eau],['vent',S.vent],['pression',S.pression]].map(([k,v])=>`<span class="chip">${lab(k,v)}</span>`).join('')}</div>
+ <div class="hero"><small>Stratégie</small><div class="num">${r.s}</div></div>
+ <div class="grid"><div class="cell w"><small>Leurre conseillé</small><div class="num">${r.l}</div></div>
+ <div class="cell"><small>Couleur</small><div class="num">${r.c}</div></div>
+ <div class="cell"><small>Animation</small><div class="num">${r.a}</div></div>
+ <div class="cell w"><small>Zone privilégiée</small><div class="num">📍 ${r.z}</div></div></div>${note}
+ <div class="acts"><button class="btn" id="again">Nouvelle sortie</button><button class="btn ghost" id="edit">Modifier les conditions</button><button class="btn ghost" id="h1">Accueil</button></div>`;
+ show('res');$('again').onclick=()=>start(SORTIE);$('h1').onclick=()=>show('home');$('edit').onclick=()=>{st=SORTIE.steps.length-1;F=SORTIE;show('wiz');render()};
+}
+function fishRes(){
+ const d=new Date(),dt=d.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})+' · '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+ const v=t=>e(t&&String(t).trim()?t:'—');
+ $('fres').innerHTML=`<div class="snap"><small class="k">FISH ON · ${dt}</small><div class="num big">${e(S.poisson)}</div>
+ <div class="grid"><div class="cell w"><small>Poste</small><div class="num">📍 ${v(S.poste)}</div></div><div class="cell w"><small>Leurre</small><div class="num">${e(S.leurre)}</div></div>
+ <div class="cell"><small>Animation</small><div class="num">${e(S.anim)}</div></div>
+ <div class="cell"><small>Couleur</small><div class="num">${v(S.couleur)}</div></div>
+ <div class="cell"><small>Météo</small><div class="num">${lab('ciel',S.ciel)}</div></div>
+ <div class="cell"><small>Température</small><div class="num">${v(S.temp)}</div></div>
+ <div class="cell"><small>Pression</small><div class="num">${v(S.hpa)}</div></div>
+ <div class="cell"><small>Vent</small><div class="num">${e(S.dir)} · ${v(S.ventf)}</div></div>
+ <div class="cell w"><small>Commentaires</small><div class="cmt">${v(S.note)}</div></div></div>
+ <div class="brand">🎣 Compagnon Pêche</div></div>
+ <div class="hint">📸 Fais une capture d’écran pour garder cette prise.</div>
+ <div class="acts"><button class="btn alt" id="again2">Nouvelle prise</button><button class="btn ghost" id="h2">Accueil</button></div>`;
+ show('fres');$('again2').onclick=()=>$('fish').click();$('h2').onclick=()=>show('home');
+}
+</script></body></html>
