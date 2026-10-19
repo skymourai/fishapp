@@ -55,6 +55,7 @@ textarea:focus{outline:0;border-color:var(--red)}
 .snap .cell{word-break:break-word}.snap .cell .num{font-size:22px}.snap .cmt{font:400 15px/1.5 Inter;text-transform:none;letter-spacing:0;margin-top:6px;white-space:pre-wrap}
 .brand{margin-top:14px;text-align:center;color:var(--mut);font:600 13px Rajdhani;letter-spacing:.25em;text-transform:uppercase}
 .hint{color:var(--mut);font-size:13px;text-align:center;margin-top:6px}
+.dt{display:grid;gap:16px}.dt label{display:grid;gap:6px;color:var(--mut);font:600 14px Rajdhani;letter-spacing:.15em;text-transform:uppercase}
 </style></head><body><div class="app">
 
 <section class="screen home on" id="home">
@@ -90,13 +91,13 @@ const SORTIE={steps:[
  {k:"id",t:"Nomme ta sortie",type:"text",ph:"Ex : Lac du matin"},
  {k:"ciel",t:"La météo",o:SKY},{k:"eau",t:"Couleur de l’eau",o:EAU},{k:"vent",t:"Force du vent",o:VENT},{k:"pression",t:"Tendance de pression",o:PRES}],done:()=>result()};
 const FISHON={steps:[
- {k:"poisson",t:"Type de poisson",o:FISH},{k:"poste",t:"Le poste",type:"text",ph:"Ex : Ponton nord, pointe des roseaux"},{k:"leurre",t:"Leurre utilisé",o:LEU,cls:"two"},{k:"anim",t:"Animation",o:ANI},
+ {k:"poisson",t:"Type de poisson",o:FISH},{k:"poste",t:"Le poste",type:"text",ph:"Ex : Ponton nord, pointe des roseaux"},{k:"dt",t:"Date et heure de la prise",type:"dt"},{k:"leurre",t:"Leurre utilisé",o:LEU,cls:"two"},{k:"anim",t:"Animation",o:ANI},
  {k:"couleur",t:"Couleur du leurre",type:"text",ph:"Ex : Chartreuse"},
- {k:"hpa",t:"Pression atmosphérique",type:"text",ph:"Ex : 1015 hPa",im:"decimal"},
+ {k:"hpa",t:"Pression atmosphérique (hPa)",type:"text",ph:"Ex : 1015",im:"decimal"},
  {k:"ciel",t:"La météo",o:SKY},
- {k:"temp",t:"Température",type:"text",ph:"Ex : 14 °C",im:"decimal"},
+ {k:"temp",t:"Température (°C)",type:"text",ph:"Ex : 14",im:"decimal"},
  {k:"dir",t:"Sens du vent",o:DIR,cls:"dir"},
- {k:"ventf",t:"Force du vent",type:"text",ph:"Ex : 12 km/h",im:"decimal"},
+ {k:"ventf",t:"Force du vent (km/h)",type:"text",ph:"Ex : 12",im:"decimal"},
  {k:"note",t:"Commentaires",type:"area",ph:"Un petit mot sur cette prise…"}],done:()=>fishRes()};
 const $=id=>document.getElementById(id);let st=0,S={},F=SORTIE;
 const e=t=>String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
@@ -108,11 +109,12 @@ function render(){
  $('bar').innerHTML=F.steps.map((_,i)=>`<i class="${i<=st?'d':''}"></i>`).join('');
  let h=`<small>Étape ${st+1} / ${n}</small><h2>${s.t}</h2>`;
  if(s.type==='text')h+=`<input id="inp" maxlength="40" placeholder="${e(s.ph)}" inputmode="${s.im||'text'}" value="${e(S[s.k])}" autocomplete="off">`;
+ else if(s.type==='dt'){if(!S.date){const n=new Date(),p=x=>String(x).padStart(2,'0');S.date=n.getFullYear()+'-'+p(n.getMonth()+1)+'-'+p(n.getDate());S.time=p(n.getHours())+':'+p(n.getMinutes())}h+=`<div class="dt"><label>Date<input id="d1" type="date" value="${S.date}"></label><label>Heure<input id="d2" type="time" value="${S.time}"></label></div>`}
  else if(s.type==='area')h+=`<textarea id="inp" maxlength="300" placeholder="${e(s.ph)}">${e(S[s.k])}</textarea>`;
  else h+=`<div class="opts ${s.cls||''}">`+s.o.map(o=>`<button class="opt ${S[s.k]===o[0]?'sel':''}" data-v="${e(o[0])}"><span class="ic">${o[1]}</span><div><b>${o[2]}</b>${o[3]?`<span class="s">${o[3]}</span>`:''}</div></button>`).join('')+'</div>';
  $('q').innerHTML=h;
  const nx=$('next');nx.textContent=last?'Valider':'Continuer';nx.classList.add('hide');
- if(s.type){nx.classList.remove('hide');$('inp').oninput=ev=>S[s.k]=ev.target.value}
+ if(s.type){nx.classList.remove('hide');if(s.type==='dt'){$('d1').oninput=ev=>S.date=ev.target.value;$('d2').oninput=ev=>S.time=ev.target.value}else $('inp').oninput=ev=>S[s.k]=ev.target.value}
  else{if(S[s.k]&&last)nx.classList.remove('hide');
   document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{S[s.k]=b.dataset.v;document.querySelectorAll('.opt').forEach(x=>x.classList.toggle('sel',x===b));
    if(!last)setTimeout(()=>{st++;render()},220);else nx.classList.remove('hide')})}
@@ -139,16 +141,17 @@ function result(){
  show('res');$('again').onclick=()=>start(SORTIE);$('h1').onclick=()=>show('home');$('edit').onclick=()=>{st=SORTIE.steps.length-1;F=SORTIE;show('wiz');render()};
 }
 function fishRes(){
- const d=new Date(),dt=d.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})+' · '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+ const d=new Date((S.date||'')+'T'+(S.time||'00:00')),dt=isNaN(d)?'':d.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})+(S.time?' · '+S.time.replace(':','h'):'');
  const v=t=>e(t&&String(t).trim()?t:'—');
+ const u=(t,x)=>{const n=String(t||'').replace(/[^\d.,\-]/g,'');return n?e(n)+' '+x:'—'};
  $('fres').innerHTML=`<div class="snap"><small class="k">FISH ON · ${dt}</small><div class="num big">${e(S.poisson)}</div>
  <div class="grid"><div class="cell w"><small>Poste</small><div class="num">📍 ${v(S.poste)}</div></div><div class="cell w"><small>Leurre</small><div class="num">${e(S.leurre)}</div></div>
  <div class="cell"><small>Animation</small><div class="num">${e(S.anim)}</div></div>
  <div class="cell"><small>Couleur</small><div class="num">${v(S.couleur)}</div></div>
  <div class="cell"><small>Météo</small><div class="num">${lab('ciel',S.ciel)}</div></div>
- <div class="cell"><small>Température</small><div class="num">${v(S.temp)}</div></div>
- <div class="cell"><small>Pression</small><div class="num">${v(S.hpa)}</div></div>
- <div class="cell"><small>Vent</small><div class="num">${e(S.dir)} · ${v(S.ventf)}</div></div>
+ <div class="cell"><small>Température</small><div class="num">${u(S.temp,'°C')}</div></div>
+ <div class="cell"><small>Pression</small><div class="num">${u(S.hpa,'hPa')}</div></div>
+ <div class="cell"><small>Vent</small><div class="num">${e(S.dir)} · ${u(S.ventf,'km/h')}</div></div>
  <div class="cell w"><small>Commentaires</small><div class="cmt">${v(S.note)}</div></div></div>
  <div class="brand">🎣 Compagnon Pêche</div></div>
  <div class="hint">📸 Fais une capture d’écran pour garder cette prise.</div>
