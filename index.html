@@ -126,14 +126,14 @@ const SORTIE={steps:[
  {k:"ciel",t:"La météo",o:SKY},{k:"eau",t:"Couleur de l’eau",o:EAU},{k:"vent",t:"Force du vent",o:VENT},{k:"pression",t:"Tendance de pression",o:PRES}],done:()=>result()};
 const FISHON={steps:[
  {k:"poisson",t:"Type de poisson",o:FISH},{k:"mesure",t:"Taille et poids",type:"mesure"},{k:"spot",t:"Le spot",o:()=>[...spots.map(x=>[x.id,"📍",x.nom,"Météo auto"]),["","➖","Sans spot","Saisie manuelle"]]},{k:"poste",t:"Le poste",type:"text",ph:"Ex : Ponton nord, pointe des roseaux"},{k:"dt",t:"Date et heure de la prise",type:"dt"},{k:"leurre",t:"Leurre utilisé",o:LEU,cls:"two"},{k:"anim",t:"Animation",o:ANI},
- {k:"couleur",t:"Couleur du leurre",type:"text",ph:"Ex : Chartreuse"},
-  {k:"ref",t:"Référence du leurre",type:"text",ph:"Ex : Caperlan Jerk 50 flottant"},
+ {k:"couleur",t:"Couleur du leurre",type:"text",ph:"Ex : Chartreuse, Naturel, oil, blanc ..."},
+  {k:"ref",t:"Référence du leurre",type:"text",ph:"Ex : Caperlan JERKBAIT MINNOW WXM MNW 65 SP"},
  {k:"hpa",t:"Pression atmosphérique (hPa)",type:"text",ph:"Ex : 1015",im:"decimal"},
  {k:"ciel",t:"La météo",o:SKY},
  {k:"temp",t:"Température (°C)",type:"text",ph:"Ex : 14",im:"decimal"},
  {k:"dir",t:"Sens du vent",o:DIR,cls:"dir"},
  {k:"ventf",t:"Force du vent (km/h)",type:"text",ph:"Ex : 12",im:"decimal"},
-  {k:"debit",t:"Débit / hauteur d’eau",type:"text",ph:"Ex : 4.2 m³/s ou 85 cm"},
+  {k:"debit",t:"Débit / hauteur d’eau",type:"text",ph:"Ex : 4.2 m³/s ou 85 cm Station Loire Monistrol"},
  {k:"photo",t:"Photo de la prise",type:"photo"},
  {k:"note",t:"Commentaires",type:"area",ph:"Un petit mot sur cette prise…"}],done:()=>fishRes()};
 const $=id=>document.getElementById(id);let st=0,S={},F=SORTIE;
