@@ -75,6 +75,7 @@ textarea:focus{outline:0;border-color:var(--red)}
 .chkrow{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;font:600 22px Rajdhani;margin-bottom:12px;cursor:pointer}.chkrow input{width:24px;height:24px;padding:0;flex:none;accent-color:var(--red)}
 .dc{flex:none;min-width:108px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center}.dc b{font-size:13px}.dc small{font-size:12px;color:var(--mut)}.di{font-size:30px;line-height:1.1}
 #crop{position:fixed;inset:0;background:rgba(6,8,12,.95);z-index:70;display:none;align-items:center;justify-content:center;padding:16px}#crop.on{display:flex}.cw{width:100%;max-width:460px;display:flex;flex-direction:column;gap:12px;align-items:center}#cv{touch-action:none;border-radius:12px;border:1px solid var(--line);background:#000}#crz{width:100%;padding:0}#crr{justify-content:center;margin:0}
+.cell .num.sm{font-size:18px;font-weight:600;line-height:1.3}
 </style></head><body><div class="app">
 
 <section class="screen home on" id="home">
@@ -82,7 +83,10 @@ textarea:focus{outline:0;border-color:var(--red)}
  <h1>Compagnon<br><span>Pêche</span></h1>
  <p>Carnassiers : indique les conditions du jour, reçois la stratégie, le leurre, la couleur, l’animation et la zone à viser.</p>
  <div class="row"><button class="btn" id="create">Créer une sortie</button><button class="btn alt" id="fish">Fish On 🐟</button></div>
+ <button class="btn ghost" id="adv" style="margin-bottom:10px">⚙️ Créer une sortie avancée</button>
  <div class="nav"><button class="btn ghost" id="nmet">☁️ Météo</button><button class="btn ghost" id="nmap">🗺️ Carte</button><button class="btn ghost" id="nlog">📒 Carnet</button></div>
+ <a class="btn ghost" href="https://www.tiktok.com/@skymourai" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none;margin-top:10px">🎵 Suivre sur TikTok · @skymourai</a>
+ <div style="text-align:center;margin-top:14px;font-size:12px;letter-spacing:.14em;color:var(--mut)">Développé par <b style="color:var(--tx);font-weight:600">Skymourai</b></div>
 </section>
 
 <section class="screen" id="wiz">
@@ -126,20 +130,62 @@ const SORTIE={steps:[
  {k:"ciel",t:"La météo",o:SKY},{k:"eau",t:"Couleur de l’eau",o:EAU},{k:"vent",t:"Force du vent",o:VENT},{k:"pression",t:"Tendance de pression",o:PRES}],done:()=>result()};
 const FISHON={steps:[
  {k:"poisson",t:"Type de poisson",o:FISH},{k:"mesure",t:"Taille et poids",type:"mesure"},{k:"spot",t:"Le spot",o:()=>[...spots.map(x=>[x.id,"📍",x.nom,"Météo auto"]),["","➖","Sans spot","Saisie manuelle"]]},{k:"poste",t:"Le poste",type:"text",ph:"Ex : Ponton nord, pointe des roseaux"},{k:"dt",t:"Date et heure de la prise",type:"dt"},{k:"leurre",t:"Leurre utilisé",o:LEU,cls:"two"},{k:"anim",t:"Animation",o:ANI},
- {k:"couleur",t:"Couleur du leurre",type:"text",ph:"Ex : Chartreuse, Naturel, oil, blanc ..."},
-  {k:"ref",t:"Référence du leurre",type:"text",ph:"Ex : Caperlan JERKBAIT MINNOW WXM MNW 65 SP"},
+ {k:"couleur",t:"Couleur du leurre",type:"text",ph:"Ex : Chartreuse, Naturel, Fire tiger"},
+  {k:"ref",t:"Référence du leurre",type:"text",ph:"Ex : Caperlan Shad Rogen 200"},
  {k:"hpa",t:"Pression atmosphérique (hPa)",type:"text",ph:"Ex : 1015",im:"decimal"},
  {k:"ciel",t:"La météo",o:SKY},
  {k:"temp",t:"Température (°C)",type:"text",ph:"Ex : 14",im:"decimal"},
  {k:"dir",t:"Sens du vent",o:DIR,cls:"dir"},
  {k:"ventf",t:"Force du vent (km/h)",type:"text",ph:"Ex : 12",im:"decimal"},
-  {k:"debit",t:"Débit / hauteur d’eau",type:"text",ph:"Ex : 4.2 m³/s ou 85 cm Station Loire Monistrol"},
+  {k:"debit",t:"Débit / hauteur d’eau",type:"text",ph:"Ex : 4.2 m³/s ou 85 cm"},
  {k:"photo",t:"Photo de la prise",type:"photo"},
  {k:"note",t:"Commentaires",type:"area",ph:"Un petit mot sur cette prise…"}],done:()=>fishRes()};
 const $=id=>document.getElementById(id);let st=0,S={},F=SORTIE;
 const e=t=>String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
 const show=id=>{document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));scrollTo(0,0)};
 const lab=(k,v)=>LAB[k].find(o=>o[0]===v)[2];
+
+/* ===== Sortie avancée (matrice complète) ===== */
+const MX=[{"id":"REG_001","e":"Brochet","sa":0,"te":0,"pr":-2,"sk":"dark","ea":["tint"],"ve":[1,2],"pp":["low"],"rs":"Printemps (Pré-fraie/Post)","rt":"Eau froide (<10°C)","rp":"Chute brutale","rk":"Couvert / Sombre","pf":"Inter-couche (1.5-3m)","st":"Power Fishing","tc":"Slow-rolling","fa":"Spinnerbait / Chatterbait","mo":"Jighead intégrée","tl":"12-16","co":"Firetiger / Chartreuse","at":"Bavette/Palette (Vibrations fortes)","an":"Linéaire lent avec pauses","zo":"Bordures baies ensoleillées & herbiers naissants"},{"id":"REG_002","e":"Brochet","sa":0,"te":1,"pr":0,"sk":"sun","ea":["clear"],"ve":[0],"pp":["mid"],"rs":"Printemps (Pré-fraie/Post)","rt":"Eau tempérée (10-18°C)","rp":"Stable","rk":"Grand Soleil","pf":"Surface à Peu profond (0.5-1.5m)","st":"Pêche de réaction","tc":"Jerkbaiting / Topwater","fa":"Jerkbait Hard / Stickbait","mo":"Leste interne / Suspending","tl":"11-15","co":"Alose / Argenté / Natural Roach","at":"Sans attractant (Visuel)","an":"Twitchs secs avec longues pauses","zo":"Lits de nénuphars & plateaux peu profonds"},{"id":"REG_003","e":"Brochet","sa":1,"te":2,"pr":0.3,"sk":"sun","ea":["clear"],"ve":[0],"pp":["high"],"rs":"Été","rt":"Eau chaude (>18°C)","rp":"Stable / Haute","rk":"Grand Soleil","pf":"Fond / Ombrage (3-6m)","st":"Finesse / Grattage","tc":"Linear / Verticale","fa":"Big Shad souple / Swimbait","mo":"Tête Plombée (7-14g)","tl":"18-25","co":"Snoek / Perche / Translucide","at":"Attractant Anis/Ecrevisse","an":"Lent au ras du fond avec légers tirées","zo":"Cassures profondes & piles de ponts"},{"id":"REG_004","e":"Brochet","sa":1,"te":2,"pr":-2,"sk":"rain","ea":["tint"],"ve":[1,2],"pp":["mid"],"rs":"Été","rt":"Eau chaude (>18°C)","rp":"Chute brutale","rk":"Orageux / Sombre","pf":"Surface (0-1m)","st":"Power Fishing / Surface","tc":"Topwater / Buzzing","fa":"Frog / Buzzbait / Popper","mo":"Hameçon Texan (Anti-herbe)","tl":"10-14","co":"Noir / Dark Violet / Orange UV","at":"Rattle puissant / Buzz","an":"Récupération rapide et chaotique","zo":"Cœur des herbiers & nénuphars"},{"id":"REG_005","e":"Brochet","sa":2,"te":1,"pr":1,"sk":"veil","ea":["tint"],"ve":[1],"pp":["low","mid"],"rs":"Automne","rt":"Eau tempérée (10-18°C)","rp":"Hausse modérée","rk":"Voilé / Variable","pf":"Inter-couche (2-4m)","st":"Power Fishing","tc":"Linear / Swimbaiting","fa":"Shad souple / Swimbaits articulés","mo":"Tête plombée VMC / Rig Shallow","tl":"15-22","co":"Perche / Blanc Nacré / Ayu","at":"Attractant Poisson","an":"Linéaire continu régulier à mi-eau","zo":"Périphérie des herbiers & chasses de fourrage"},{"id":"REG_006","e":"Brochet","sa":3,"te":0,"pr":0.3,"sk":"dark","ea":["clear"],"ve":[0],"pp":["high"],"rs":"Hiver","rt":"Eau froide (<10°C)","rp":"Stable / Haute","rk":"Couvert / Brume","pf":"Fond / Fosses (>5m)","st":"Pêche Lente / Deadsticking","tc":"Verticale / Slow Jerk","fa":"Gros Shad / Soft Jerk","mo":"Tête plombée lourde (14-25g)","tl":"18-30","co":"Motoroil / Chartreuse / Glow","at":"Attractant Ail / Poisson","an":"Animation ultra-lente presque immobile","zo":"Fosses profondes & lit de rivière"},{"id":"REG_007","e":"Sandre","sa":0,"te":1,"pr":0,"sk":"dawn","ea":["tint"],"ve":[0],"pp":["mid"],"rs":"Printemps (Pré-fraie/Post)","rt":"Eau tempérée (10-18°C)","rp":"Stable","rk":"Aube / Crépuscule","pf":"Fond (1.5-3m)","st":"Grattage / Tactile","tc":"Scratch Fishing / Drop-Shot","fa":"Finesse / Pintail / Slug","mo":"Tête Sabot / Football (5-10g)","tl":"8-12","co":"Blanc Rose UV / Chartreuse","at":"Attractant Écrevisse","an":"Petits bonds sur le fond / Pause 3 sec","zo":"Secteurs sablonneux & gravières peu profondes"},{"id":"REG_008","e":"Sandre","sa":1,"te":2,"pr":0.3,"sk":"sun","ea":["clear"],"ve":[0],"pp":["high"],"rs":"Été","rt":"Eau chaude (>18°C)","rp":"Stable / Haute","rk":"Grand Soleil","pf":"Profond (>6m)","st":"Verticale / Pelagique","tc":"Verticale / Live-Scope","fa":"Pintail / Slug / Shad droit","mo":"Tête Plombée Peinte (10-20g)","tl":"12-16","co":"Bleu Holo / Crystal Clear / Translucide","at":"Attractant Strong Fish","an":"Maintien stationnaire au-dessus du poisson","zo":"Eaux libres / Pélagique & structures noyées"},{"id":"REG_009","e":"Sandre","sa":2,"te":1,"pr":-2,"sk":"rain","ea":["mud"],"ve":[1],"pp":["low"],"rs":"Automne","rt":"Eau tempérée (10-18°C)","rp":"Chute brutale","rk":"Pluvieux / Sombre","pf":"Fond (3-5m)","st":"Power Verticale","tc":"Verticale lourde","fa":"Shad à forte vibration / Chatter","mo":"Tête Plombée Darter / VMC","tl":"10-14","co":"Firetiger UV / Jaune Fluo / Noir","at":"Rattle métallique / Attractant","an":"Animation dynamique avec forts dards","zo":"Entrées de canaux & amortis de courant"},{"id":"REG_010","e":"Sandre","sa":3,"te":0,"pr":0.3,"sk":"dark","ea":["clear"],"ve":[0],"pp":["mid"],"rs":"Hiver","rt":"Eau froide (<10°C)","rp":"Stable / Haute","rk":"Couvert","pf":"Profond (6-10m)","st":"Grattage ultra-lourd","tc":"Linear à gratter","fa":"Shad souple tail fin / Grub","mo":"Tête Plombée Football (15-28g)","tl":"9-12","co":"Ayu / Ghost / Motoroil UV","at":"Attractant Ail / Sang","an":"Glissades lentes sur le fond sans décoller","zo":"Trous d'eau / Fosses de barrage"},{"id":"REG_011","e":"Perche","sa":0,"te":1,"pr":0,"sk":"sun","ea":["clear"],"ve":[0],"pp":["mid"],"rs":"Printemps","rt":"Eau tempérée (10-18°C)","rp":"Stable","rk":"Grand Soleil","pf":"Surface à Inter-couche","st":"Finesse / Réaction","tc":"Light Crank / Spin-tail","fa":"Crankbait Shallow / Tailspinner","mo":"Intégré","tl":"4-7","co":"Perche / Dos Vert / Holo Silver","at":"Sans attractant","an":"Récupération continue très rapide","zo":"Bordures de quais & piles de pont"},{"id":"REG_012","e":"Perche","sa":1,"te":2,"pr":-2,"sk":"dawn","ea":["clear","tint"],"ve":[0],"pp":["high"],"rs":"Été","rt":"Eau chaude (>18°C)","rp":"Chute brutale","rk":"Aube / Crépuscule","pf":"Surface (0-0.5m)","st":"Surface / Chasse","tc":"Topwater / Walk-the-dog","fa":"Stickbait Ultra-Light / Popper","mo":"Armement triple ventral","tl":"5-8","co":"Blanc Transparent / Ghost Shad","at":"Sans attractant","an":"Ziczac rapide en surface (Walk the dog)","zo":"Chasses de surface / Hauts-fonds"},{"id":"REG_013","e":"Perche","sa":2,"te":1,"pr":1,"sk":"veil","ea":["tint"],"ve":[1],"pp":["low"],"rs":"Automne","rt":"Eau tempérée (10-18°C)","rp":"Hausse modérée","rk":"Voilé / Variable","pf":"Inter-couche (2-4m)","st":"Power Fishing Light","tc":"Linear / Darting","fa":"Blade Bait (Lame) / Micro-Jig","mo":"Lame Métallique / Jighead","tl":"5-9","co":"Mat Tiger / Chartreuse / Camo","at":"Rattle intégré lame","an":"Dents de scie rapides entre deux eaux","zo":"Bancs de friture en pleine eau"},{"id":"REG_014","e":"Perche","sa":3,"te":0,"pr":0.3,"sk":"dark","ea":["clear"],"ve":[0],"pp":["high"],"rs":"Hiver","rt":"Eau froide (<10°C)","rp":"Stable / Haute","rk":"Couvert","pf":"Fond (4-8m)","st":"Finesse statique","tc":"Drop-Shot / Carolina Rig","fa":"Créature / Ecrevisse / Micro Slug","mo":"Plomb Palan / Texan léger","tl":"5-7","co":"Motoroil / Cinnamon / Blood","at":"Attractant Ecrevisse intense","an":"Micro-vibrations sur place sans déplacer le plomb","zo":"Trous profonds & pieds de bâti"},{"id":"REG_015","e":"Black-bass","sa":0,"te":1,"pr":0,"sk":"sun","ea":["clear"],"ve":[0],"pp":["mid"],"rs":"Printemps","rt":"Eau tempérée (10-18°C)","rp":"Stable","rk":"Grand Soleil","pf":"Peu profond (0.5-1.5m)","st":"Sight Fishing (A vue)","tc":"Wacky / Neko Rig","fa":"Whacky Worm / Straight Stick","mo":"Hameçon Wacky Wacky + Weight","tl":"10-14","co":"Green Pumpkin / Watermelon","at":"Attractant Sel / Anis","an":"Tremblements lents au coulé à vue","zo":"Nids & bordures ombragées"},{"id":"REG_016","e":"Black-bass","sa":1,"te":2,"pr":0.3,"sk":"sun","ea":["tint"],"ve":[0],"pp":["high"],"rs":"Été","rt":"Eau chaude (>18°C)","rp":"Stable / Haute","rk":"Grand Soleil","pf":"Cœur d'obstacle (0-2m)","st":"Pitching / Punching","tc":"Punching / Rubber Jig","fa":"Rubber Jig + Trailer Ecrevisse","mo":"Tête Balle Texan lourde (14-28g)","tl":"8-12","co":"Black & Blue / Junebug","at":"Attractant Écrevisse / Ail","an":"Pénétration brutale dans le couvert + pauses","zo":"Cœur des herbiers mats & bois mort dense"},{"id":"REG_017","e":"Truite","sa":0,"te":0,"pr":0,"sk":"sun","ea":["clear"],"ve":[0],"pp":["low"],"rs":"Printemps","rt":"Eau froide (<10°C)","rp":"Stable","rk":"Grand Soleil","pf":"Fond / Radier (0.5-1.5m)","st":"Ultra-Léger / Precision","tc":"Cuillère / Minnow Coulant","fa":"Cuillère Ondulante / Density Minnow","mo":"Hameçon Simple sans ardillon","tl":"3-6","co":"Argent / Cuivre / Truite Fario","at":"Palette brillante","an":"Animation lente en dérive naturelle dans le courant","zo":"Amortis de courant & têtes de pool"},{"id":"REG_018","e":"Truite","sa":1,"te":1,"pr":1,"sk":"veil","ea":["clear"],"ve":[0],"pp":["mid"],"rs":"Été","rt":"Eau tempérée (10-18°C)","rp":"Hausse modérée","rk":"Voilé / Ombragé","pf":"Courant vif / Surface","st":"Pêche active / Twitching","tc":"Hard Minnow / Insecte","fa":"Poisson Nageur Suspending / Insecte","mo":"Micro-triples ou simples","tl":"4-7","co":"Vairon / Ghost Pink / Imimic Bug","at":"Sans attractant","an":"Twitchs très rapides dans les courants vifs","zo":"Cascades / Veines d'eau rapides & sous-berge"},{"id":"REG_019","e":"Silure","sa":1,"te":2,"pr":-2,"sk":"rain","ea":["mud"],"ve":[1,2],"pp":["low"],"rs":"Été","rt":"Eau chaude (>18°C)","rp":"Chute brutale","rk":"Orageux / Sombre","pf":"Profond à Inter-couche","st":"Vibrations Massives","tc":"Power Linear / Verticale","fa":"Big Shad 25cm+ / Chatterbait Heavy","mo":"Tête Plombée Extra-Heavy (40-80g)","tl":"20-30","co":"Firetiger / Noir / Pink Fluo","at":"Rattle Bille Acier XL + Attractant Poisson","an":"Vibrations maximales en linéaire lent","zo":"Fosses de fleuve & sorties de barrage"},{"id":"REG_020","e":"Brochet","sa":2,"te":null,"pr":-2,"sk":"rain","ea":["tint"],"ve":[2],"pp":["low"],"rs":"Automne","rt":"n.c.","rp":"Chute brutale","rk":"Pluvieux / Ventueux","pf":"Peu profond (1-2m)","st":"Power Fishing","tc":"Spinnerbait heavy","fa":"Spinnerbait double feuille de saule","mo":"Tête intégrée 21g","tl":"14-18","co":"Chartreuse / White Glow","at":"Double palette métallique","an":"Lancer-ramener rapide sur la côte battue par les vagues","zo":"Bordures exposées au vent plein fouet"}];
+const ESP=[["Brochet","🐊","Brochet"],["Sandre","👁️","Sandre"],["Perche","🐠","Perche"],["Black-bass","🐟","Black-bass"],["Truite","🐟","Truite"],["Silure","🐟","Silure"]];
+const SAI=[["0","🌱","Printemps"],["1","☀️","Été"],["2","🍂","Automne"],["3","❄️","Hiver"]];
+const TEA=[["0","🥶","Eau froide","< 10 °C"],["1","🌤️","Eau tempérée","10 – 18 °C"],["2","🔥","Eau chaude","> 18 °C"]];
+const PRB=[["-1","↘️","Baisse modérée"],["-2","⬇️","Chute brutale"],["0","➡️","Stable / haute"],["1","↗️","Hausse"]];
+const SK2=[["sun","☀️","Grand soleil"],["veil","🌤️","Voilé / variable"],["dark","☁️","Couvert / sombre"],["dawn","🌅","Aube / crépuscule"],["rain","🌧️","Pluvieux / orageux"]];
+const EA2=[["clear","💧","Claire"],["tint","🍵","Teintée"],["mud","🟤","Boueuse / chargée"]];
+const VT2=[["0","🍃","Faible / calme","0–10 km/h"],["1","🌬️","Modéré","10–25 km/h"],["2","💨","Fort","+25 km/h"]];
+const PPE=[["low","🌲","Peu pêché","Spot sauvage, isolé"],["mid","🎣","Moyennement pêché","Fréquentation normale"],["high","👥","Très pêché","Spot connu, pression forte"]];
+const ADV={steps:[
+ {k:"id",t:"Nomme ta sortie",type:"text",ph:"Ex : Brochet du matin"},
+ {k:"esp",t:"Espèce ciblée",o:ESP},{k:"sai",t:"Saison",o:SAI},{k:"teau",t:"Température de l’eau",o:TEA},{k:"pres",t:"Tendance de pression",o:PRB},
+ {k:"sky",t:"Ciel et luminosité",o:SK2},{k:"eau2",t:"Couleur de l’eau",o:EA2},{k:"vent2",t:"Force du vent",o:VT2},{k:"pp",t:"Pression de pêche sur le spot",o:PPE}],done:()=>resultAdv()};
+const MXW={sa:3,te:3,pr:2,sk:2,ea:2,ve:1.5,pp:1},MXN={sa:'la saison',te:'la température de l’eau',pr:'la pression',sk:'la luminosité',ea:'la couleur de l’eau',ve:'le vent',pp:'la pression de pêche'};
+const SKS={sun:{veil:.4,dawn:.3},veil:{sun:.4,dark:.4,dawn:.4},dark:{veil:.4,rain:.5},dawn:{veil:.4,sun:.3},rain:{dark:.5}},EAS={clear:{tint:.4},tint:{clear:.4,mud:.5},mud:{tint:.5}},PPO=['low','mid','high'];
+const mx=a=>Math.max(0,...a);
+function scoreAdv(r){
+ const d=Math.abs(+S.sai-r.sa),o={};
+ o.sa=[1,.4,0][Math.min(d,4-d)];
+ o.te=r.te==null?.5:Math.max(0,1-Math.abs(+S.teau-r.te)*.6);
+ o.pr=Math.max(0,1-Math.abs(+S.pres-r.pr)/2);
+ o.sk=r.sk===S.sky?1:(SKS[S.sky]||{})[r.sk]||0;
+ o.ea=r.ea.includes(S.eau2)?1:mx(r.ea.map(x=>(EAS[S.eau2]||{})[x]||0));
+ o.ve=r.ve.includes(+S.vent2)?1:mx(r.ve.map(x=>Math.abs(x-S.vent2)===1?.4:0));
+ o.pp=r.pp.includes(S.pp)?1:mx(r.pp.map(x=>Math.abs(PPO.indexOf(x)-PPO.indexOf(S.pp))===1?.5:0));
+ const w=Object.keys(MXW);return{r,o,t:w.reduce((a,k)=>a+MXW[k]*o[k],0)/w.reduce((a,k)=>a+MXW[k],0)};
+}
+function resultAdv(){
+ const L=MX.filter(r=>r.e===S.esp).map(scoreAdv).sort((a,b)=>b.t-a.t),A=L[0],B=L.slice(1).find(x=>x.r.fa!==A.r.fa)||L[1],r=A.r,pc=Math.round(A.t*100),col=pc>=75?'#2ecc71':pc>=55?'#ffc46b':'#ff3b4e';
+ const lb=(a,v)=>(a.find(x=>x[0]===v)||[])[2]||v,bad=Object.keys(MXW).filter(k=>A.o[k]<.5).map(k=>MXN[k]);
+ const c=(t,v,w,sm)=>`<div class="cell${w?' w':''}"><small>${t}</small><div class="num${sm?' sm':''}">${e(v)}</div></div>`;
+ $('res').innerHTML=`<small style="color:var(--red);font:600 14px Rajdhani;letter-spacing:.2em">PLAN DE PÊCHE AVANCÉ</small><h2>${e(S.id)}</h2>
+ <div class="recap"><span class="chip" style="border-color:${col};color:${col}">Compatibilité ${pc} %</span>${[[ESP,'esp'],[SAI,'sai'],[TEA,'teau'],[PRB,'pres'],[SK2,'sky'],[EA2,'eau2'],[VT2,'vent2'],[PPE,'pp']].map(([a,k])=>`<span class="chip">${e(lb(a,S[k]))}</span>`).join('')}</div>
+ <div class="hero"><small>Stratégie</small><div class="num">${e(r.st)}</div><div style="color:var(--mut);margin-top:4px">${e(r.tc)}</div></div>
+ <div class="grid">${c('Famille de leurre',r.fa,1,1)}${c('Monture / tête',r.mo,1,1)}${c('Taille',r.tl+' cm')}${c('Coloris',r.co,0,1)}${c('Attractant / bruit',r.at,1,1)}${c('Animation',r.an,1,1)}${c('Profondeur cible',r.pf,1,1)}${c('Zone privilégiée','📍 '+r.zo,1,1)}${B?c('Option B · '+Math.round(B.t*100)+' %',B.r.fa+' · '+B.r.co+' · '+B.r.st,1,1):''}</div>
+ ${pc<60?`<div class="note">⚠️ La matrice n’a pas de fiche proche de ta situation pour cette espèce : prends ceci comme une base et adapte-la.</div>`:bad.length?`<div class="note">ℹ️ Fiche la plus proche de tes conditions. Écarts avec ${bad.join(', ')} : adapte le poids du leurre et ta présentation.</div>`:''}
+ <div class="hint" style="text-align:left">Fiche ${r.id} · ${e(r.rs)} · ${e(r.rt)} · ${e(r.rp)} · ${e(r.rk)}</div>
+ <div class="acts"><button class="btn" id="again">Nouvelle sortie avancée</button><button class="btn ghost" id="edit">Modifier les conditions</button><button class="btn ghost" id="h1">Accueil</button></div>`;
+ show('res');$('again').onclick=()=>start(ADV);$('h1').onclick=()=>show('home');$('edit').onclick=()=>{st=ADV.steps.length-1;F=ADV;show('wiz');render()};
+}
 function start(f){F=f;S={};st=0;show('wiz');render()}
 function render(){
  const s=F.steps[st],n=F.steps.length,last=st===n-1;
@@ -158,7 +204,7 @@ function render(){
   document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{S[s.k]=b.dataset.v;document.querySelectorAll('.opt').forEach(x=>x.classList.toggle('sel',x===b));
    if(!last)setTimeout(()=>{st++;render()},220);else nx.classList.remove('hide')})}
 }
-$('create').onclick=()=>start(SORTIE);
+$('create').onclick=()=>start(SORTIE);$('adv').onclick=()=>start(ADV);
 $('fish').onclick=()=>$('modal').classList.add('on');
 $('ok').onclick=()=>{$('modal').classList.remove('on');start(FISHON)};
 $('back').onclick=()=>{if(st>0){st--;render()}else show('home')};$('next').onclick=async()=>{const s=F.steps[st];if(s.type==='dt'&&F===FISHON)await autoMeteo();
@@ -232,7 +278,7 @@ const stC={};
 async function getStationsProches(lat,lon){
  const k=lat+','+lon;if(stC[k])return stC[k];
  try{const j=await(await fetch(`${HB}referentiel/stations?latitude=${lat}&longitude=${lon}&distance=40&size=100`)).json();
-  return stC[k]=(j.data||[]).filter(x=>x.en_service!==false&&x.latitude_station!=null).map(x=>({c:x.code_station,n:x.libelle_station,d:km(lat,lon,x.latitude_station,x.longitude_station)})).sort((a,b)=>a.d-b.d)}catch(_){return[]}
+  return stC[k]=(j.data||[]).filter(x=>x.en_service!==false&&x.latitude_station!=null&&!/supprim/i.test(x.libelle_station||'')).map(x=>({c:x.code_station,n:x.libelle_station,d:km(lat,lon,x.latitude_station,x.longitude_station)})).sort((a,b)=>a.d-b.d)}catch(_){return[]}
 }
 const orderSt=(l,sp)=>sp&&sp.sc?[...l.filter(x=>x.c===sp.sc),...l.filter(x=>x.c!==sp.sc)]:l;
 async function getMesuresStation(c,q='size=192'){
@@ -335,7 +381,7 @@ async function meteoDebit(lat,lon,id,code){
   const sts=await getStationsProches(lat,lon);
   if(tok!==MT||!$('dtxt'))return;
   if(!sts.length){$('dtxt').textContent='💧 Aucune station de débit à moins de 40 km.';$('c4').parentNode.classList.add('hide');return}
-  const sel=code||(sp&&sp.sc)||sts[0].c;
+  const sel=[code,sp&&sp.sc].find(c=>c&&sts.some(x=>x.c===c))||sts[0].c;
   $('dselect').innerHTML=`<select id="stSelect" style="width:100%;padding:10px;border-radius:10px;background:var(--card);color:var(--tx);border:1px solid var(--line);font-size:14px">`+sts.map(x=>`<option value="${x.c}" ${x.c===sel?'selected':''}>${e(x.n)} (${x.d.toFixed(1)} km)</option>`).join('')+'</select>';
   $('stSelect').onchange=ev=>{if(sp){sp.sc=ev.target.value;SV('cp_spots',spots)}meteoDebit(lat,lon,id,ev.target.value)};
   if(c4){c4.destroy();c4=null}
