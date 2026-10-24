@@ -76,6 +76,7 @@ textarea:focus{outline:0;border-color:var(--red)}
 .dc{flex:none;min-width:108px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center}.dc b{font-size:13px}.dc small{font-size:12px;color:var(--mut)}.di{font-size:30px;line-height:1.1}
 #crop{position:fixed;inset:0;background:rgba(6,8,12,.95);z-index:70;display:none;align-items:center;justify-content:center;padding:16px}#crop.on{display:flex}.cw{width:100%;max-width:460px;display:flex;flex-direction:column;gap:12px;align-items:center}#cv{touch-action:none;border-radius:12px;border:1px solid var(--line);background:#000}#crz{width:100%;padding:0}#crr{justify-content:center;margin:0}
 .home{gap:9px;padding-bottom:14px}.home h1{font-size:46px}.home p{font-size:14px;line-height:1.4;margin:0 0 4px}.home .row{gap:8px}.home>.btn,.home .row .btn{padding:13px 18px;font-size:18px}.home .nav .btn{padding:10px 4px}
+.sit{border-collapse:collapse;font-size:13px}.sit td{padding:6px 4px;text-align:center;min-width:46px;border-bottom:1px solid var(--line);white-space:nowrap}.sit td:first-child{position:sticky;left:0;background:var(--card);color:var(--mut);text-align:left;font-weight:600;min-width:62px;z-index:1}.sit .ix{border-radius:8px;font-weight:700;color:#fff;padding:5px 0}.sit .off{opacity:.3}
 .cell .num.sm{font-size:18px;font-weight:600;line-height:1.3}
 </style></head><body><div class="app">
 
@@ -86,6 +87,7 @@ textarea:focus{outline:0;border-color:var(--red)}
  <div class="row"><button class="btn" id="create">Créer une sortie</button><button class="btn alt" id="fish">Fish On 🐟</button></div>
  <button class="btn ghost" id="adv" style="padding:13px 18px;font-size:18px">⚙️ Créer une sortie avancée</button>
  <div class="nav"><button class="btn ghost" id="nmet">☁️ Météo</button><button class="btn ghost" id="nmap">🗺️ Carte</button><button class="btn ghost" id="nlog">📒 Carnet</button></div>
+ <button class="btn ghost" id="nsi" style="padding:11px;font-size:16px">🎯 Score indice météo</button>
  <a class="btn ghost" href="https://www.tiktok.com/@skymourai" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none;padding:11px;font-size:15px">🎵 Suivre sur TikTok · @skymourai</a>
  <div style="text-align:center;margin-top:2px;font-size:12px;letter-spacing:.14em;color:var(--mut)">Développé par <b style="color:var(--tx);font-weight:600">Skymourai</b></div>
 </section>
@@ -106,6 +108,9 @@ textarea:focus{outline:0;border-color:var(--red)}
  <div id="mres"></div><div id="lmap"></div>
  <div class="cbox hide" id="spform"><input id="spn" maxlength="40" placeholder="Nom du spot (ex : Ponton nord)"><div class="nav" style="grid-template-columns:2fr 1fr;margin-top:10px"><button class="btn alt" id="sps">Enregistrer</button><button class="btn ghost" id="spc">Annuler</button></div></div>
  <div class="hint" id="mh">Touche la carte pour ajouter un spot de pêche.</div></section>
+<section class="screen" id="sci"><div class="hd"><button class="back" data-home>‹</button><h2 style="font-size:26px">Score indice météo</h2></div>
+ <div class="srch"><input id="sicity" placeholder="Ville du spot…" autocomplete="off"><button class="btn" id="sigo">OK</button></div>
+ <div id="sires"></div><div class="chips" id="sispots"></div><div class="chips" id="sidays"></div><div id="siout"><div class="hint">Cherche une ville ou choisis un de tes spots.</div></div></section>
 <section class="screen" id="log"><div class="hd"><button class="back" data-home>‹</button><h2>Carnet</h2></div>
  <div class="chips" id="lf"></div><div id="ll"></div>
  <div class="acts"><button class="btn ghost" id="exp">⬇️ Exporter la sauvegarde</button><button class="btn ghost" id="imp">⬆️ Importer une sauvegarde</button><input type="file" id="impf" accept=".json" hidden></div></section>
@@ -131,8 +136,8 @@ const SORTIE={steps:[
  {k:"ciel",t:"La météo",o:SKY},{k:"eau",t:"Couleur de l’eau",o:EAU},{k:"vent",t:"Force du vent",o:VENT},{k:"pression",t:"Tendance de pression",o:PRES}],done:()=>result()};
 const FISHON={steps:[
  {k:"poisson",t:"Type de poisson",o:FISH},{k:"mesure",t:"Taille et poids",type:"mesure"},{k:"spot",t:"Le spot",o:()=>[...spots.map(x=>[x.id,"📍",x.nom,"Météo auto"]),["","➖","Sans spot","Saisie manuelle"]]},{k:"poste",t:"Le poste",type:"text",ph:"Ex : Ponton nord, pointe des roseaux"},{k:"dt",t:"Date et heure de la prise",type:"dt"},{k:"leurre",t:"Leurre utilisé",o:LEU,cls:"two"},{k:"anim",t:"Animation",o:ANI},
- {k:"couleur",t:"Couleur du leurre",type:"text",ph:"Ex : Chartreuse, Naturel, Fire tiger, Ayu"},
-  {k:"ref",t:"Référence du leurre",type:"text",ph:"Ex : Caperlan Shad ROGEN 200"},
+ {k:"couleur",t:"Couleur du leurre",type:"text",ph:"Ex : Chartreuse, Fire Tiger, Naturel"},
+  {k:"ref",t:"Référence du leurre",type:"text",ph:"Ex : Caperlan Shad ROGEN 200 TP7G"},
  {k:"hpa",t:"Pression atmosphérique (hPa)",type:"text",ph:"Ex : 1015",im:"decimal"},
  {k:"ciel",t:"La météo",o:SKY},
  {k:"temp",t:"Température (°C)",type:"text",ph:"Ex : 14",im:"decimal"},
@@ -446,4 +451,80 @@ $('ll').onclick=ev=>{const c=ev.target.closest('.lg');if(!c)return;if(ev.target.
 $('exp').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({spots,prises})],{type:'application/json'}));a.download='carnet-peche-'+new Date().toISOString().slice(0,10)+'.json';a.click()};
 $('imp').onclick=()=>$('impf').click();
 $('impf').onchange=async ev=>{try{const d=JSON.parse(await ev.target.files[0].text()),m=(a,b)=>[...b.filter(x=>!a.some(y=>y.id===x.id)),...a];spots=m(spots,d.spots||[]);prises=m(prises,d.prises||[]);SV('cp_spots',spots);SV('cp_prises',prises);renderLog();toast('Import terminé')}catch(_){toast('Fichier invalide')}};
+
+/* ===== Score indice météo (carnassiers aux leurres) ===== */
+const RD=Math.PI/180,E0=RD*23.4397,dd=ms=>ms/864e5-.5+2440588-2451545;
+function moonC(d){const L=RD*(218.316+13.176396*d),M=RD*(134.963+13.064993*d),F=RD*(93.272+13.22935*d),l=L+RD*6.289*Math.sin(M),b=RD*5.128*Math.sin(F);return{ra:Math.atan2(Math.sin(l)*Math.cos(E0)-Math.tan(b)*Math.sin(E0),Math.cos(l)),dec:Math.asin(Math.sin(b)*Math.cos(E0)+Math.cos(b)*Math.sin(E0)*Math.sin(l)),dist:385001-20905*Math.cos(M)}}
+function moonAlt(ms,lat,lon){const d=dd(ms),c=moonC(d),H=RD*(280.16+360.9856235*d)+RD*lon-c.ra,p=RD*lat;return Math.asin(Math.sin(p)*Math.sin(c.dec)+Math.cos(p)*Math.cos(c.dec)*Math.cos(H))}
+function moonPh(ms){const d=dd(ms),m=moonC(d),M=RD*(357.5291+.98560028*d),Ls=M+RD*(1.9148*Math.sin(M)+.02*Math.sin(2*M)+.0003*Math.sin(3*M))+RD*102.9372+Math.PI,sra=Math.atan2(Math.sin(Ls)*Math.cos(E0),Math.cos(Ls)),sdec=Math.asin(Math.sin(E0)*Math.sin(Ls)),sd=149598000,ph=Math.acos(Math.sin(sdec)*Math.sin(m.dec)+Math.cos(sdec)*Math.cos(m.dec)*Math.cos(sra-m.ra)),inc=Math.atan2(sd*Math.sin(ph),m.dist-sd*Math.cos(ph)),ang=Math.atan2(Math.cos(sdec)*Math.sin(sra-m.ra),Math.sin(sdec)*Math.cos(m.dec)-Math.cos(sdec)*Math.sin(m.dec)*Math.cos(sra-m.ra));return{f:(1+Math.cos(inc))/2,p:.5+.5*inc*(ang<0?-1:1)/Math.PI}}
+let SI=LS('cp_si',null),SD=0,SJ=null;
+const SM=15*6e4,p2=n=>String(n).padStart(2,'0'),hm=(ms,o)=>{const d=new Date(ms+o*1e3);return p2(d.getUTCHours())+'h'+p2(d.getUTCMinutes())};
+function dayScores(j,di){
+ const off=j.utc_offset_seconds,td=x=>Date.parse(x+':00Z')-off*1e3,h=j.hourly,T=h.time.map(td),D=j.daily,t0=td(D.time[di]+'T00:00'),sr=td(D.sunrise[di]),ss=td(D.sunset[di]),lo=sr-18e5,hi=ss+18e5,H1=36e5;
+ const lerp=(a,t)=>{const f=(t-T[0])/H1,i=Math.max(0,Math.min(T.length-2,Math.floor(f))),r=f-i;return a[i]*(1-r)+a[i+1]*r},idx=t=>Math.max(0,Math.min(T.length-1,Math.floor((t-T[0])/H1)));
+ const al=[];for(let t=t0-2*H1;t<=t0+26*H1;t+=3e5)al.push([t,moonAlt(t,SI.lat,SI.lon)]);
+ const maj=[],mr=[],ms=[];
+ for(let k=1;k<al.length-1;k++){const a=al[k-1][1],b=al[k][1],c=al[k+1][1];if(b>a&&b>=c||b<a&&b<=c)maj.push(al[k][0]);if(a<0&&b>=0)mr.push(al[k][0]);if(a>=0&&b<0)ms.push(al[k][0])}
+ const mi=mr.concat(ms),near=(a,w,t)=>a.some(x=>Math.abs(t-x)<=w),st=[];
+ for(let k=0;k<96;k++){
+  const t=t0+k*SM,tm=t+SM/2,i=idx(tm),cl=h.cloud_cover[i]||0,cd=h.weather_code[i]||0,P=lerp(h.pressure_msl,tm),dP=P-lerp(h.pressure_msl,tm-3*H1),V=lerp(h.wind_speed_10m,tm),
+   pr=h.precipitation[Math.min(i+1,T.length-1)]||0,pv=(h.precipitation[Math.max(0,i-2)]||0)+(h.precipitation[Math.max(0,i-1)]||0)+(h.precipitation[i]||0),
+   dawn=Math.abs(tm-sr)<=H1||Math.abs(tm-ss)<=H1,noon=Math.abs(tm-(sr+ss)/2)<3*H1,n={};
+  n.s=tm<lo||tm>hi?5:dawn?10:(cl>80||cd===45||cd===48)?9:cl>=40?6:noon?2:4;
+  n.p=dP<-3?5:dP<=-1?10:dP>3?3:dP>=1?5:(P>1025?3:P<1005?5:P>=1012&&P<=1018?8:7);
+  n.l=near(maj,H1,tm)?10:near(mi,27e5,tm)?7:3;
+  n.v=V>35?1:V>25?6:V>=12?10:V>=6?7:V>=5?5:3;
+  n.r=cd>=95||pr>4?0:pr>1.5?3:pr>.1?10:pv>.3?8:5;
+  let sc=n.s*.3+n.p*.25+n.l*.2+n.v*.15+n.r*.1;const bo=[];
+  if(tm>=ss-54e5&&tm<=ss+18e5||tm>=sr-18e5&&tm<=sr+54e5){sc+=1.5;bo.push('coup du '+(tm>(sr+ss)/2?'soir':'matin'))}
+  if(V>15&&cl>80){sc+=1;bo.push('vent + ciel couvert')}
+  if(n.s===2&&V<5){sc-=2;bo.push('plein soleil sans vent')}
+  st.push({t,tm,s:Math.max(0,Math.min(10,sc)),n,V,dP,bo,legal:t+SM>lo&&t<hi});
+ }
+ const hr=[];for(let k=0;k<24;k++){const a=st.slice(k*4,k*4+4),i=idx(t0+k*H1),c=t0+k*H1+H1/2;hr.push({k,s:a.reduce((x,y)=>x+y.s,0)/4,lg:a.filter(x=>x.legal).length>=2,T:h.temperature_2m[i],V:h.wind_speed_10m[i],D:h.wind_direction_10m[i],P:h.pressure_msl[i],R:h.precipitation[Math.min(i+1,T.length-1)]||0,C:h.weather_code[i],dy:c>sr&&c<ss})}
+ return{st,hr,sr,ss,lo,hi,mr:mr.filter(x=>x>=t0&&x<t0+24*H1),ms:ms.filter(x=>x>=t0&&x<t0+24*H1),ph:moonPh(t0+12*H1),off,t0};
+}
+const ql=x=>x>=7.5?'Excellent':x>=6?'Très bon':x>=4.5?'Correct':x>=3?'Moyen':'Faible';
+function whySI(x,sr,ss){const n=x.n,r=[];
+ if(n.s===10)r.push((x.tm>(sr+ss)/2?'coucher':'lever')+' du soleil');else if(n.s===9)r.push('ciel couvert');
+ if(n.l===10)r.push('lune au zénith / nadir');else if(n.l===7)r.push('lever ou coucher de lune');
+ if(n.p===10)r.push(`pression en baisse progressive (${x.dP.toFixed(1)} hPa/3 h)`);else if(n.p>=8)r.push('pression stable');
+ if(n.v===10)r.push(`vent modéré (${Math.round(x.V)} km/h)`);
+ if(n.r>=8)r.push(n.r===10?'pluie fine':'temps sec après averse');
+ return r.concat(x.bo)}
+function openSI(){show('sci');if(!SI&&MT)SI=MT;drawSIchips();if(SI)loadSI()}
+function drawSIchips(){
+ $('sispots').innerHTML=spots.map(x=>`<span class="chip ${SI&&SI.id===x.id?'on':''}" data-id="${x.id}">📍 ${e(x.nom)}</span>`).join('');
+ $('sidays').innerHTML=SJ?SJ.daily.time.slice(1).map((d,i)=>`<span class="chip ${i===SD?'on':''}" data-d="${i}">${i?i===1?'Demain':new Date(d+'T12:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric'}):'Aujourd’hui'}</span>`).join(''):'';
+}
+function setSI(c){SI=c;SD=0;SJ=null;SV('cp_si',c);drawSIchips();loadSI()}
+$('nsi').onclick=openSI;
+$('sispots').onclick=ev=>{const c=ev.target.closest('[data-id]');if(!c)return;const x=spots.find(y=>y.id===c.dataset.id);setSI({id:x.id,name:x.nom,lat:x.lat,lon:x.lon})};
+$('sidays').onclick=ev=>{const c=ev.target.closest('[data-d]');if(c){SD=+c.dataset.d;drawSIchips();drawSI()}};
+$('sigo').onclick=()=>search('sicity','sires',g=>setSI({name:g.name,lat:g.lat,lon:g.lon}));
+$('sicity').onkeydown=ev=>{if(ev.key==='Enter')$('sigo').click()};
+async function loadSI(){
+ const tok=SI;$('siout').innerHTML='<div class="hint">Calcul des indices…</div>';
+ try{const j=await(await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${SI.lat}&longitude=${SI.lon}&hourly=temperature_2m,pressure_msl,wind_speed_10m,wind_direction_10m,cloud_cover,precipitation,weather_code&daily=sunrise,sunset&wind_speed_unit=kmh&past_days=1&forecast_days=7&timezone=auto`)).json();
+  if(tok!==SI)return;SJ=j;drawSIchips();drawSI()}
+ catch(_){$('siout').innerHTML='<div class="note">Impossible de charger les données (connexion ?).</div>'}
+}
+function drawSI(){
+ const r=dayScores(SJ,SD+1),o=r.off,legal=r.st.filter(x=>x.legal),avg=legal.reduce((a,x)=>a+x.s,0)/(legal.length||1);
+ const pool=legal.filter(x=>SD>0||x.t+SM>Date.now());let best=null;
+ if(pool.length){const n=Math.min(8,pool.length);for(let a=0;a+n<=pool.length;a++){const w=pool.slice(a,a+n),m=w.reduce((x,y)=>x+y.s,0)/n;if(!best||m>best.m)best={w,m}}}
+ let hero='<div class="note">Plus aucun créneau de pêche autorisé aujourd’hui : choisis un autre jour.</div>',pk=null;
+ if(best){const w=best.w;pk=w.reduce((a,b)=>b.s>a.s?b:a);const a=Math.max(w[0].t,r.lo),b=Math.min(w[w.length-1].t+SM,r.hi),nm={s:'Luminosité',p:'Pression',l:'Lune',v:'Vent',r:'Pluie'};
+  hero=`<div class="hero"><small>Meilleur indice${SD?'':' · à venir'}</small><div class="num">${hm(a,o)} – ${hm(b,o)}</div><div style="color:var(--mut);margin-top:4px">Indice ${best.m.toFixed(1)} / 10 · pic à ${hm(pk.t,o)} (${pk.s.toFixed(1)})</div></div>
+  <div class="recap">${whySI(pk,r.sr,r.ss).map(x=>`<span class="chip">${e(x)}</span>`).join('')}</div>
+  <div class="hint" style="text-align:left">Notes au pic : ${Object.keys(nm).map(k=>nm[k]+' '+pk.n[k]+'/10').join(' · ')}</div>`}
+ const mp=Math.round(r.ph.p*8)%8,mr=r.mr[0],ms=r.ms[0],c=(t,v)=>`<div class="cell"><small>${t}</small><div class="num sm">${v}</div></div>`;
+ const ce=(x,v)=>`<td class="${x.lg?'':'off'}">${v}</td>`,row=(l,f)=>`<tr><td>${l}</td>${r.hr.map(f).join('')}</tr>`;
+ const tb=`<table class="sit">${row('Heure',x=>ce(x,x.k+'h'))}${row('Ciel',x=>ce(x,wmh(x.C,x.dy?1:0)[0]))}${row('Temp.',x=>ce(x,Math.round(x.T)+'°'))}${row('Vent',x=>ce(x,Math.round(x.V)+'<br><span style="display:inline-block;transform:rotate('+(x.D+180)+'deg)">↑</span>'))}${row('hPa',x=>ce(x,Math.round(x.P)))}${row('Pluie',x=>ce(x,x.R?x.R.toFixed(1):'–'))}${row('Indice',x=>`<td class="${x.lg?'':'off'}"><div class="ix" style="background:hsl(${Math.round(x.s*12)} 65% 38%)">${x.s.toFixed(1)}</div></td>`)}</table>`;
+ $('siout').innerHTML=`<div style="color:var(--mut);margin-bottom:8px">📍 ${e(SI.name)}</div>${hero}
+ <div class="grid">${c('Indice du jour',avg.toFixed(1)+' / 10 · '+ql(avg))}${c('Pêche autorisée',hm(r.lo,o)+' → '+hm(r.hi,o))}${c('Soleil','☀️ '+hm(r.sr,o)+' → '+hm(r.ss,o))}${c('Lune',['🌑','🌒','🌓','🌔','🌕','🌖','🌗','🌘'][mp]+' '+Math.round(r.ph.f*100)+' % · ↑ '+(mr?hm(mr,o):'–')+' ↓ '+(ms?hm(ms,o):'–'))}</div>
+ <div class="cbox sc" id="sisc" style="padding:8px">${tb}</div>
+ <div class="hint" style="text-align:left">Heures grisées = pêche interdite (plus de 30 min avant le lever ou après le coucher du soleil, art. R436-13). Exceptions locales possibles : vérifie les arrêtés de ton département.</div>`;
+ if(pk)$('sisc').scrollLeft=Math.max(0,new Date(pk.t+o*1e3).getUTCHours()*46-60);
+}
 </script></body></html>
