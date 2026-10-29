@@ -87,6 +87,53 @@ textarea:focus{outline:0;border-color:var(--red)}
 .strategy-plan .grid{margin-top:12px}
 .strategy-plan .cbox{margin-top:12px}
 
+
+/* Correctif anti-débordement : cartes de stratégie et textes longs */
+.app, .screen, .res, .cbox, .strategy-plan, .strategy-head,
+.strategy-head > div, .strategy-plan .grid, .strategy-plan .cell,
+.strategy-plan .cbox, .v2text, .note, .hero, .recap {
+  min-width: 0;
+  max-width: 100%;
+}
+.strategy-plan { overflow: hidden; }
+.strategy-head { width: 100%; }
+.strategy-head > div { flex: 1 1 180px; }
+.strategy-head h3 { max-width: 100%; overflow-wrap: anywhere; word-break: normal; }
+.strategy-score { flex: 0 1 180px; min-width: 0; max-width: 100%; overflow-wrap: anywhere; word-break: normal; }
+.strategy-plan .grid { grid-template-columns: minmax(0, 1fr); }
+.strategy-plan .grid > .cell,
+.strategy-plan .grid > .cell.w { grid-column: 1 / -1; min-width: 0; width: 100%; }
+.strategy-plan .cell .num,
+.strategy-plan .cell .num.sm,
+.strategy-plan .v2text,
+.strategy-plan .note,
+.strategy-plan .cbox,
+.v2section, .v2pill, .chip {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  white-space: normal;
+  line-height: 1.45;
+}
+.strategy-plan .cell .num,
+.strategy-plan .cell .num.sm {
+  font-size: 16px;
+  letter-spacing: 0;
+  text-transform: none;
+  font-family: Inter, system-ui, sans-serif;
+  font-weight: 500;
+}
+.strategy-plan .cbox h3 { width: auto; max-width: 100%; position: static; overflow-wrap: anywhere; white-space: normal; }
+.strategy-plan .recap .chip { white-space: normal; overflow-wrap: anywhere; }
+@media (max-width: 360px) {
+  .app { padding-left: 12px; padding-right: 12px; }
+  .strategy-plan { padding: 10px; }
+  .strategy-head h3 { font-size: 18px; }
+  .strategy-score { text-align: left; flex-basis: 100%; }
+  .strategy-plan .cell { padding: 11px; }
+}
+
 </style></head><body><div class="app">
 
 <section class="screen home on" id="home">
