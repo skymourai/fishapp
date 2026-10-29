@@ -134,16 +134,45 @@ textarea:focus{outline:0;border-color:var(--red)}
   .strategy-plan .cell { padding: 11px; }
 }
 
+
+.help-screen{overflow-y:auto;overscroll-behavior:contain;padding-bottom:18px;min-height:0}
+.help-intro{padding:14px;border-radius:16px;border:1px solid rgba(255,59,78,.35);background:linear-gradient(135deg,rgba(255,59,78,.13),rgba(122,92,255,.12));line-height:1.5;margin-bottom:12px;font-size:14px}
+.help-card{padding:14px;margin-bottom:10px}
+.help-card h3{font:700 18px Rajdhani,sans-serif;letter-spacing:.06em;margin:0 0 8px;color:var(--tx)}
+.help-card p,.help-card li{font:400 13px/1.55 Inter,sans-serif;color:#d5d9e2;margin:0 0 9px;overflow-wrap:anywhere}
+.help-card p:last-child{margin-bottom:0}.help-card ul{padding-left:19px;margin:6px 0 10px}
+.help-note{font-size:13px;line-height:1.5;margin:8px 0 12px}
+@media (max-height: 850px) and (max-width: 600px){
+ .app{padding-top:10px;padding-bottom:10px}
+ .home{gap:6px;padding-bottom:4px;justify-content:space-between}
+ .home-logo{font-size:42px!important;min-height:30px;max-height:45px}
+ .home h1{font-size:37px;line-height:.86}
+ .home p{font-size:12px;line-height:1.25;margin:0}
+ .home .row{gap:7px}
+ .home>.btn,.home .row .btn{padding:10px 9px;font-size:15px;letter-spacing:.04em;border-radius:11px}
+ .home .hint{font-size:10px;margin-top:-3px}
+ .home .nav{gap:6px}.home .nav .btn{padding:8px 2px;font-size:13px}
+ .home #nsi,.home #how{padding:8px!important;font-size:13px!important}
+ .home>a{padding:8px!important;font-size:12px!important}
+ .home>div:last-child{font-size:10px!important}
+}
+@media (max-height: 700px) and (max-width: 600px){
+ .home{gap:4px}.home-logo{display:none!important}.home h1{font-size:32px}.home p{font-size:11px}
+ .home>.btn,.home .row .btn{padding:8px 7px;font-size:13px}
+ .home .nav .btn{padding:7px 2px;font-size:12px}
+}
+
 </style></head><body><div class="app">
 
 <section class="screen home on" id="home">
- <div style="flex:1;display:grid;place-items:center;font-size:64px;filter:drop-shadow(0 0 30px rgba(255,59,78,.6))">🎣</div>
+ <div class="home-logo" style="flex:1;display:grid;place-items:center;font-size:64px;filter:drop-shadow(0 0 30px rgba(255,59,78,.6))">🎣</div>
  <h1>Compagnon<br><span>Pêche</span></h1>
  <p>Carnassiers : indique les conditions du jour, reçois la stratégie, le leurre, la couleur, l’animation et la zone à viser.</p>
  <div class="row"><button class="btn" id="create">Créer une sortie</button><button class="btn alt" id="fish">Fish On 🐟</button></div>
  <button class="btn ghost" id="adv" style="padding:13px 18px;font-size:18px">🧠 Compagnon Pêche V2 · stratégie avancée</button><div class="hint">V2 : espèce, habitat, profondeur, fourrage, courant et plan B</div>
  <div class="nav"><button class="btn ghost" id="nmet">☁️ Météo</button><button class="btn ghost" id="nmap">🗺️ Carte</button><button class="btn ghost" id="nlog">📒 Carnet</button></div>
  <button class="btn ghost" id="nsi" style="padding:11px;font-size:16px">🎯 Score indice météo</button>
+ <button class="btn ghost" id="how" style="padding:11px;font-size:16px">ℹ️ Comment cela fonctionne ?</button>
  <a class="btn ghost" href="https://www.tiktok.com/@skymourai" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none;padding:11px;font-size:15px">🎵 Suivre sur TikTok · @skymourai</a>
  <div style="text-align:center;margin-top:2px;font-size:12px;letter-spacing:.14em;color:var(--mut)">Développé par <b style="color:var(--tx);font-weight:600">Skymourai</b></div>
 </section>
@@ -168,6 +197,19 @@ textarea:focus{outline:0;border-color:var(--red)}
 <section class="screen" id="sci"><div class="hd"><button class="back" data-home>‹</button><h2 style="font-size:26px">Score indice météo</h2></div>
  <div class="srch"><input id="sicity" placeholder="Ville du spot…" autocomplete="off"><button class="btn" id="sigo">OK</button></div>
  <div id="sires"></div><div class="chips" id="sispots"></div><div class="chips" id="sidays"></div><div id="siout"><div class="hint">Cherche une ville ou choisis un de tes spots.</div></div></section>
+<section class="screen help-screen" id="help">
+ <div class="hd"><button class="back" data-home aria-label="Retour à l’accueil">‹</button><h2 style="font-size:27px">Comment ça marche ?</h2></div>
+ <div class="help-intro">🎣 <b>Compagnon Pêche</b> t’aide à préparer une session, choisir une approche et garder une trace de tes prises. Les scores servent à comparer des scénarios : ils ne prédisent pas avec certitude les touches.</div>
+ <div class="cbox help-card"><h3>🎯 1. Créer une sortie</h3><p><b>Mode simple :</b> indique la date, puis les conditions proposées (ciel/luminosité, couleur de l’eau, vent et tendance de pression). En automatique, l’application récupère les données météo disponibles pour le lieu et la date choisis. La matrice associe cette combinaison à une stratégie, un leurre, une couleur, une animation et une zone à prospecter. Si le vent réel diffère de celui prévu par la matrice, un avertissement invite à adapter le montage et la dérive.</p></div>
+ <div class="cbox help-card"><h3>🧠 2. Stratégie avancée</h3><p>Choisis une espèce (sandre, perche ou brochet), le lac ou la rivière, et la pêche du bord ou en embarcation. Tu peux préciser l’habitat, la profondeur, le fourrage, le courant, l’activité observée, la température d’eau si tu la connais, la saison, la visibilité de l’eau, le ciel et le vent.</p><p>Le moteur classe les fiches de stratégie selon leur adéquation avec les réponses. Il affiche un <b>Plan A</b> et une alternative <b>Plan B</b>, avec technique, leurre, taille, poids indicatif, couleur, profondeur, zone, animation et circonstances qui justifieraient de changer d’approche.</p><p><b>Indice de compatibilité :</b> les critères connus sont pondérés : habitat 2 ; profondeur 2 ; activité 1,7 ; approche bord/bateau 1,2 ; milieu lac/rivière 1,5 ; fourrage 1,5 ; courant 1,4 ; température d’eau catégorisée 1,1 ; saison 1 ; visibilité de l’eau 1 ; luminosité 0,5 ; vent 0,4. Un critère inconnu est ignoré. Une correspondance reçoit tout le poids du critère ; une non-correspondance reçoit un quart du poids. Le pourcentage est donc un <b>score de compatibilité avec les règles de la bibliothèque</b>, pas une chance de capture.</p><p>Si tu choisis une autre espèce que sandre, perche ou brochet, l’application utilise les matrices de recommandations existantes et les ajuste avec les conditions disponibles.</p></div>
+ <div class="cbox help-card"><h3>🌦️ 3. Score indice météo</h3><p>Cet indice horaire combine cinq composantes calculées à partir des prévisions météo et de calculs astronomiques pour le lieu et le jour :</p><ul><li><b>Luminosité / situation solaire : 30 %</b> — nuit, aube/coucher, ciel couvert ou plein soleil.</li><li><b>Pression : 25 %</b> — niveau de pression et surtout son évolution sur environ 3 heures.</li><li><b>Lune : 20 %</b> — proximité des passages de la lune (lever, coucher, culmination).</li><li><b>Vent : 15 %</b> — force du vent, avec une note meilleure dans la plage modérée prévue par le calcul.</li><li><b>Pluie : 10 %</b> — intensité des précipitations et conditions récentes.</li></ul><p>Des ajustements mineurs peuvent s’ajouter selon la proximité du lever/coucher du soleil, le vent avec ciel couvert ou le plein soleil sans vent. Le score est ramené sur 10 et affiché par créneau horaire. Les mentions « faible » à « excellent » sont des classes indicatives. Cet indice est général : il ne tient pas compte directement de l’espèce ciblée, de l’habitat ou de la pression de pêche, et <b>ne représente pas une probabilité de capture</b>.</p></div>
+ <div class="cbox help-card"><h3>☁️ 4. Météo</h3><p>Recherche une ville ou sélectionne un spot enregistré pour consulter les prévisions disponibles : pression et tendance, vent et direction, rafales, pluie, ciel et température. Les graphes aident à repérer l’évolution au cours de la journée. La flèche du vent représente la direction vers laquelle il souffle ; l’orientation météo nommée « vent de sud » désigne son origine au sud.</p></div>
+ <div class="cbox help-card"><h3>🗺️ 5. Carte et spots</h3><p>La carte permet de chercher un lieu, de se repérer et d’enregistrer tes spots. Lorsqu’un spot est sélectionné, l’application peut proposer des stations hydrométriques proches pour consulter le débit ou la hauteur d’eau, selon les mesures disponibles. La station peut être choisie dans la liste proposée. La disponibilité et la distance des stations dépendent du réseau de mesure.</p></div>
+ <div class="cbox help-card"><h3>🐟 6. Fish On</h3><p>Après une capture, renseigne le poisson, le poste, le leurre, l’animation, la couleur, les conditions météo et les mesures éventuelles (taille et poids). Tu peux ajouter une photo, la recadrer et générer une fiche souvenir à enregistrer. La prise est ajoutée au carnet local de l’application si le stockage du navigateur le permet.</p></div>
+ <div class="cbox help-card"><h3>📒 7. Carnet et sauvegarde</h3><p>Le carnet rassemble les prises enregistrées sur cet appareil/navigateur et permet de les consulter. Utilise <b>Exporter la sauvegarde</b> pour conserver une copie du carnet, puis <b>Importer</b> pour restaurer une sauvegarde. Les données locales peuvent être perdues si les données du navigateur sont effacées : exporte-les régulièrement.</p></div>
+ <div class="note help-note">À retenir : les recommandations sont des points de départ fondés sur des règles et les informations disponibles. Observe le poste, respecte la réglementation locale et ajuste la présentation en fonction des réactions des poissons.</div>
+ <button class="btn ghost" data-home style="margin:8px 0 18px">Retour à l’accueil</button>
+ </section>
 <section class="screen" id="log"><div class="hd"><button class="back" data-home>‹</button><h2>Carnet</h2></div>
  <div class="chips" id="lf"></div><div id="ll"></div>
  <div class="acts"><button class="btn ghost" id="exp">⬇️ Exporter la sauvegarde</button><button class="btn ghost" id="imp">⬆️ Importer une sauvegarde</button><input type="file" id="impf" accept=".json" hidden></div></section>
@@ -868,6 +910,7 @@ function drawSIchips(){
 }
 function setSI(c){SI=c;SD=0;SJ=null;SV('cp_si',c);drawSIchips();loadSI()}
 $('nsi').onclick=openSI;
+$('how').onclick=()=>show('help');
 $('sispots').onclick=ev=>{const c=ev.target.closest('[data-id]');if(!c)return;const x=spots.find(y=>y.id===c.dataset.id);setSI({id:x.id,name:x.nom,lat:x.lat,lon:x.lon})};
 $('sidays').onclick=ev=>{const c=ev.target.closest('[data-d]');if(c){SD=+c.dataset.d;drawSIchips();drawSI()}};
 $('sigo').onclick=()=>search('sicity','sires',g=>setSI({name:g.name,lat:g.lat,lon:g.lon}));
