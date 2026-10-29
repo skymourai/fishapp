@@ -72,6 +72,7 @@ textarea:focus{outline:0;border-color:var(--red)}
 #toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#171a22;border:1px solid var(--line);padding:12px 18px;border-radius:14px;z-index:60;display:none;max-width:90%;text-align:center;font-size:14px}
 #gres .opt,#mres .opt{width:100%;margin-bottom:8px;padding:12px}
 .chkrow{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;font:600 22px Rajdhani;margin-bottom:12px;cursor:pointer}.chkrow input{width:24px;height:24px;padding:0;flex:none;accent-color:var(--red)}
+.wind-arrow{font-size:20px;line-height:1.05;color:var(--tx)}.wind-dir{display:inline-block;margin-top:2px;font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--mut);line-height:1.1}
 .dc{flex:none;min-width:108px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center}.dc b{font-size:13px}.dc small{font-size:12px;color:var(--mut)}.di{font-size:30px;line-height:1.1}
 #crop{position:fixed;inset:0;background:rgba(6,8,12,.95);z-index:70;display:none;align-items:center;justify-content:center;padding:16px}#crop.on{display:flex}.cw{width:100%;max-width:460px;display:flex;flex-direction:column;gap:12px;align-items:center}#cv{touch-action:none;border-radius:12px;border:1px solid var(--line);background:#000}#crz{width:100%;padding:0}#crr{justify-content:center;margin:0}
 .home{gap:9px;padding-bottom:14px}.home h1{font-size:46px}.home p{font-size:14px;line-height:1.4;margin:0 0 4px}.home .row{gap:8px}.home>.btn,.home .row .btn{padding:13px 18px;font-size:18px}.home .nav .btn{padding:10px 4px}
@@ -131,9 +132,11 @@ const FISH=[["Truite","🐟","Truite"],["Brochet","🐊","Brochet"],["Sandre","�
 const LEU=[...new Set([...Object.values(M).map(r=>r.l),"Lame vibrante"])].map(l=>[l,"",l]);
 const ANI=[["Lente","🐢","Lente"],["Moyenne","🚶","Moyenne"],["Rapide","⚡","Rapide"]];
 const DIR=["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSO","SO","OSO","O","ONO","NO","NNO"].map(d=>[d,"",d]);
+const windDirLabel=d=>Number.isFinite(Number(d))&&d!==null&&d!==''?DIR[(Math.round((((Number(d)%360)+360)%360)/22.5)+8)%16][0]:'—';
 const LAB={ciel:SKY,eau:EAU,vent:VENT,pression:PRES};
 const SORTIE={steps:[
  {k:"id",t:"Nomme ta sortie",type:"text",ph:"Ex : Lac du matin"},
+ {k:"date",t:"Date de la sortie",type:"sortiedate"},
  {k:"ciel",t:"La météo",o:SKYA},{k:"loc",t:"Localisation",type:"loc",skip:()=>S.ciel!=='Auto'},{k:"eau",t:"Couleur de l’eau",o:EAU},{k:"vent",t:"Force du vent",o:VENT,skip:()=>S.ciel==='Auto'},{k:"pression",t:"Tendance de pression",o:PRES,skip:()=>S.ciel==='Auto'}],done:()=>result()};
 const FISHON={steps:[
  {k:"poisson",t:"Type de poisson",o:FISH},{k:"mesure",t:"Taille et poids",type:"mesure"},{k:"spot",t:"Le spot",o:()=>[...spots.map(x=>[x.id,"📍",x.nom,"Météo auto"]),["","➖","Sans spot","Saisie manuelle"]]},{k:"poste",t:"Le poste",type:"text",ph:"Ex : Ponton nord, pointe des roseaux"},{k:"dt",t:"Date et heure de la prise",type:"dt"},{k:"leurre",t:"Leurre utilisé",o:LEU,cls:"two"},{k:"anim",t:"Animation",o:ANI},
@@ -304,7 +307,7 @@ ADV.done=()=>resultAdvV2();
 
 /* ===== Sortie : mode météo automatique ===== */
 const VS=()=>F.steps.filter(x=>!x.skip||!x.skip());
-const autoNote=()=>S.autoOK?`<div class="note">📍 ${e(S.locName)}<br>📡 Conditions ${S.adate?'prévues':'détectées'} : ${e(S.autoTxt)}</div>`:'';
+const autoNote=()=>S.autoOK?`<div class="note">📍 ${e(S.locName)}<br>📡 Conditions ${(S.adate||(F===SORTIE&&S.date))?'prévues':'détectées'} : ${e(S.autoTxt)}</div>`:'';
 async function autoSortie(lat,lon){
  const j=await fetchJSON(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,pressure_msl,wind_speed_10m,cloud_cover,precipitation,weather_code&past_days=1&forecast_days=2&wind_speed_unit=kmh&timezone=auto`);if(!j.hourly||!Array.isArray(j.hourly.time)||!Array.isArray(j.hourly.pressure_msl)||!Array.isArray(j.hourly.wind_speed_10m))throw new Error('Données météo incomplètes');const h=(j=>{S.off=j.utc_offset_seconds;return j})(j),H=h.hourly;
  const T=H.time.map(x=>Date.parse(x+':00Z')-S.off*1e3),n=Date.now();let i=0;while(i<T.length-1&&T[i+1]<=n)i++;
@@ -355,9 +358,9 @@ function initDay(){
 function initLoc(){
  const pick=async(name,lat,lon,id)=>{const t=S.locTok=Date.now();S.autoOK=0;S.locName=name;S.locId=id||'';
   if(F===ADV){S.advLat=lat;S.advLon=lon;S.locOK=1;S.adate='';S.autoV2Note='';$('lcr').innerHTML=`<div class="note">📍 ${e(name)}<br>À l’étape suivante, tu choisis la date : la météo sera prévue pour ce jour-là.</div>`;return}
-  $('lcr').innerHTML='<div class="hint">Récupération de la météo…</div>';
-  try{await autoSortie(lat,lon);if(S.locTok!==t)return;$('lcr').innerHTML=autoNote()}
-  catch(_){if(S.locTok!==t)return;S.autoOK=0;$('lcr').innerHTML='<div class="note">⚠️ Météo indisponible pour ce lieu. Vérifie ta connexion ou choisis la météo manuellement.</div>'}};
+  $('lcr').innerHTML='<div class="hint">Récupération de la météo pour la date choisie…</div>';
+  try{const D=S.date||new Date().toISOString().slice(0,10),dl=new Date(D+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});await autoDay(lat,lon,D,dl);if(S.locTok!==t)return;$('lcr').innerHTML=autoNote()+`<div class="hint">Météo moyenne prévue pendant les heures de pêche de cette date.</div>`}
+  catch(_){if(S.locTok!==t)return;S.autoOK=0;$('lcr').innerHTML='<div class="note">⚠️ Prévision indisponible pour cette date et ce lieu. Vérifie la date ou choisis la météo manuellement.</div>'}};
  $('lcg').onclick=()=>search('lci','lcr',g=>pick(g.name,g.lat,g.lon));
  $('lci').onkeydown=ev=>{if(ev.key==='Enter')$('lcg').click()};
  document.querySelectorAll('.opts .opt').forEach(b=>b.onclick=()=>{const x=spots.find(y=>y.id===b.dataset.id);document.querySelectorAll('.opts .opt').forEach(z=>z.classList.toggle('sel',z===b));pick(x.nom,x.lat,x.lon,x.id)});
@@ -368,6 +371,7 @@ function render(){
  $('bar').innerHTML=VS().map((_,i)=>`<i class="${i<=st?'d':''}"></i>`).join('');
  let h=`<small>Étape ${st+1} / ${n}</small><h2>${s.t}</h2>`;
  if(s.type==='text')h+=`<input id="inp" maxlength="60" placeholder="${e(s.ph)}" inputmode="${s.im||'text'}" value="${e(S[s.k])}" autocomplete="off">`;
+ else if(s.type==='sortiedate'){if(!S.date){const n=new Date(),p=x=>String(x).padStart(2,'0');S.date=n.getFullYear()+'-'+p(n.getMonth()+1)+'-'+p(n.getDate())}const today=new Date(),plus7=new Date(today.getFullYear(),today.getMonth(),today.getDate()+7),fmt=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');h+=`<label>Date de la sortie<input id="sortiedate" type="date" required min="${fmt(today)}" max="${fmt(plus7)}" value="${e(S.date)}"></label><div class="hint">Choisis le jour de ta sortie. En mode automatique, la météo sera calculée pour cette date (prévisions disponibles jusqu’à 7 jours).</div>`}
  else if(s.type==='dt'){if(!S.date){const n=new Date(),p=x=>String(x).padStart(2,'0');S.date=n.getFullYear()+'-'+p(n.getMonth()+1)+'-'+p(n.getDate());S.time=p(n.getHours())+':'+p(n.getMinutes())}h+=`<div class="dt"><label>Date<input id="d1" type="date" value="${S.date}"></label><label>Heure<input id="d2" type="time" value="${S.time}"></label></div>`}
  else if(s.type==='photo')h+=`<label class="btn ghost" style="display:block;text-align:center;margin-bottom:14px">📷 Prendre / choisir une photo<input id="ph" type="file" accept="image/*" hidden></label><img id="pv" class="pv ${S.photo?'':'hide'}" src="${S.photo||''}"><div class="hint">Optionnel · compressée pour ne pas encombrer ton stockage</div>`;
  else if(s.type==='mesure')h+=[['T','📏','Taille','cm','taille'],['P','⚖️','Poids','kg','poids']].map(([a,ic,l,u,k])=>`<label class="chkrow"><input type="checkbox" id="c${a}" ${S['c'+a]?'checked':''}><span>${ic} ${l}</span></label><input id="i${a}" inputmode="decimal" maxlength="8" placeholder="${l} en ${u}" value="${e(S[k])}" autocomplete="off" style="margin:-4px 0 12px;${S['c'+a]?'':'display:none'}">`).join('')+'<div class="hint">Coche ce que tu as mesuré · saisis seulement le nombre</div>';
@@ -377,7 +381,7 @@ function render(){
  else h+=`<div class="opts ${s.cls||''}">`+(typeof s.o==='function'?s.o():s.o).map(o=>`<button class="opt ${S[s.k]===o[0]?'sel':''}" data-v="${e(o[0])}"><span class="ic">${o[1]}</span><div><b>${o[2]}</b>${o[3]?`<span class="s">${o[3]}</span>`:''}</div></button>`).join('')+'</div>';
  if(S.auto&&['hpa','ciel','temp','dir','ventf'].includes(s.k))h+='<div class="hint">☁️ Pré-rempli par Open-Meteo, modifie si besoin.</div>';if(S.ciel==='Auto'&&S.autoOK&&s.k==='eau')h+=autoNote();if(F===ADV&&S.modeV2==='auto'&&S.autoOK&&s.k==='eau2')h+=autoNote();$('q').innerHTML=h;
  const nx=$('next');nx.textContent=last?'Valider':'Continuer';nx.classList.add('hide');
- if(s.type){nx.classList.remove('hide');if(s.type==='dt'){$('d1').oninput=ev=>S.date=ev.target.value;$('d2').oninput=ev=>S.time=ev.target.value}else if(s.type==='photo')$('ph').onchange=pickPhoto;else if(s.type==='mesure')initMz();else if(s.type==='loc')initLoc();else if(s.type==='dday')initDay();else $('inp').oninput=ev=>S[s.k]=ev.target.value}
+ if(s.type){nx.classList.remove('hide');if(s.type==='sortiedate'){$('sortiedate').onchange=ev=>{S.date=ev.target.value;};$('sortiedate').oninput=ev=>{S.date=ev.target.value;}}else if(s.type==='dt'){$('d1').oninput=ev=>S.date=ev.target.value;$('d2').oninput=ev=>S.time=ev.target.value}else if(s.type==='photo')$('ph').onchange=pickPhoto;else if(s.type==='mesure')initMz();else if(s.type==='loc')initLoc();else if(s.type==='dday')initDay();else $('inp').oninput=ev=>S[s.k]=ev.target.value}
  else{if(S[s.k])nx.classList.remove('hide');
   document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{S[s.k]=b.dataset.v;document.querySelectorAll('.opt').forEach(x=>x.classList.toggle('sel',x===b));
    if(s.k==='modeV2'){S.autoOK=0;S.locOK=0;S.adate='';S.locName='';S.locId='';S.autoV2Note=''}if(s.k==='eau2'){S.clarte2=({clear:'clear',tint:'tint',mud:'mud',algae:'algae'})[S.eau2]||'unknown'}if(!last)setTimeout(()=>{st++;render()},220);else nx.classList.remove('hide')})}
@@ -386,13 +390,14 @@ $('create').onclick=()=>start(SORTIE);$('adv').onclick=()=>start(ADV);
 $('fish').onclick=()=>start(FISHON);
 $('back').onclick=()=>{if(st>0){st--;render()}else show('home')};$('next').onclick=async()=>{const s=VS()[st];if(s.type==='loc'&&!(F===ADV?S.locOK:S.autoOK))return toast('Choisis d’abord un lieu');if(s.type==='dday'&&!S.autoOK)return toast('Choisis d’abord une date');if(s.type==='dt'&&F===FISHON)await autoMeteo();
  if(s.k==='id'&&!(S.id||'').trim())S.id='Sortie du '+new Date().toLocaleDateString('fr-FR');
+ if(s.type==='sortiedate'&&!S.date)return toast('Choisis la date de ta sortie');
  if(st<VS().length-1){st++;render()}else F.done()};
 function result(){
  const sk=S.ciel==='Auto'?S.cielA:S.ciel,r=M[[sk,S.eau,S.pression].join('|')];
  const wl=lab('vent',S.vent);
  const note=r.v!==S.vent?`<div class="note">ℹ️ La matrice a été établie pour un vent « ${lab('vent',r.v).toLowerCase()} » avec ces conditions. Avec un vent ${wl.toLowerCase()}, adapte le poids du leurre et ta dérive.</div>`:'';
  $('res').innerHTML=`<small style="color:var(--red);font:600 14px Rajdhani;letter-spacing:.2em">PLAN DE PÊCHE</small><h2>${e(S.id)}</h2>
- <div class="recap">${S.ciel==='Auto'?`<span class="chip">📡 Auto · ${e(S.locName)}</span>`:''}${[['ciel',sk],['eau',S.eau],['vent',S.vent],['pression',S.pression]].map(([k,v])=>`<span class="chip">${lab(k,v)}</span>`).join('')}</div>
+ <div class="recap"><span class="chip">📅 ${e(S.date?new Date(S.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short',year:'numeric'}):'Date non renseignée')}</span>${S.ciel==='Auto'?`<span class="chip">📡 Auto · ${e(S.locName)}</span>`:''}${[['ciel',sk],['eau',S.eau],['vent',S.vent],['pression',S.pression]].map(([k,v])=>`<span class="chip">${lab(k,v)}</span>`).join('')}</div>
  <div class="hero"><small>Stratégie</small><div class="num">${r.s}</div></div>
  <div class="grid"><div class="cell w"><small>Leurre conseillé</small><div class="num">${r.l}</div></div>
  <div class="cell"><small>Couleur</small><div class="num">${r.c}</div></div>
@@ -755,7 +760,7 @@ function drawSI(){
   <div class="hint" style="text-align:left">Notes au pic : ${Object.keys(nm).map(k=>nm[k]+' '+pk.n[k]+'/10').join(' · ')}</div>`}
  const mp=Math.round(r.ph.p*8)%8,mr=r.mr[0],ms=r.ms[0],c=(t,v)=>`<div class="cell"><small>${t}</small><div class="num sm">${v}</div></div>`;
  const ce=(x,v)=>`<td class="${x.lg?'':'off'}">${v}</td>`,row=(l,f)=>`<tr><td>${l}</td>${r.hr.map(f).join('')}</tr>`;
- const tb=`<table class="sit">${row('Heure',x=>ce(x,x.k+'h'))}${row('Ciel',x=>ce(x,wmh(x.C,x.dy?1:0)[0]))}${row('Temp.',x=>ce(x,Math.round(x.T)+'°'))}${row('Vent',x=>ce(x,Math.round(x.V)+'<br><span style="display:inline-block;transform:rotate('+(x.D+180)+'deg)">↑</span>'))}${row('hPa',x=>ce(x,Math.round(x.P)))}${row('Pluie',x=>ce(x,x.R?x.R.toFixed(1):'–'))}${row('Indice',x=>`<td class="${x.lg?'':'off'}"><div class="ix" style="background:hsl(${Math.round(x.s*12)} 65% 38%)">${x.s.toFixed(1)}</div></td>`)}</table>`;
+ const tb=`<table class="sit">${row('Heure',x=>ce(x,x.k+'h'))}${row('Ciel',x=>ce(x,wmh(x.C,x.dy?1:0)[0]))}${row('Temp.',x=>ce(x,Math.round(x.T)+'°'))}${row('Vent',x=>ce(x,Math.round(x.V)+'<br><span class="wind-arrow" style="display:inline-block;transform:rotate('+(x.D+180)+'deg)">↑</span><br><span class="wind-dir">'+windDirLabel(x.D)+'</span>'))}${row('hPa',x=>ce(x,Math.round(x.P)))}${row('Pluie',x=>ce(x,x.R?x.R.toFixed(1):'–'))}${row('Indice',x=>`<td class="${x.lg?'':'off'}"><div class="ix" style="background:hsl(${Math.round(x.s*12)} 65% 38%)">${x.s.toFixed(1)}</div></td>`)}</table>`;
  $('siout').innerHTML=`<div style="color:var(--mut);margin-bottom:8px">📍 ${e(SI.name)}</div>${hero}
  <div class="grid">${c('Indice du jour',avg.toFixed(1)+' / 10 · '+ql(avg))}${c('Pêche autorisée',hm(r.lo,o)+' → '+hm(r.hi,o))}${c('Soleil','☀️ '+hm(r.sr,o)+' → '+hm(r.ss,o))}${c('Lune',['🌑','🌒','🌓','🌔','🌕','🌖','🌗','🌘'][mp]+' '+Math.round(r.ph.f*100)+' % · ↑ '+(mr?hm(mr,o):'–')+' ↓ '+(ms?hm(ms,o):'–'))}</div>
  <div class="cbox sc" id="sisc" style="padding:8px">${tb}</div>
